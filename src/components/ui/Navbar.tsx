@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { HelpCircle, Github, Linkedin, Instagram, Languages, RotateCcw } from 'lucide-react'; // Importamos RotateCcw
+import { HelpCircle, Github, Linkedin, Instagram, Languages, RotateCcw } from 'lucide-react';
 import { GridConfig, Language } from '@/lib/types';
 import { translations } from '@/lib/translations';
 
@@ -33,25 +33,28 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
       <div className="flex items-center gap-10">
         <div className="font-black text-white tracking-widest text-sm uppercase italic shrink-0">GRIDFORGE</div>
         
-        <div className="flex gap-8 border-l border-slate-700 pl-8 items-center">
+        <div className="flex gap-6 border-l border-slate-700 pl-8 items-center">
           {(['columns', 'rows', 'gap'] as const).map(k => (
-            <div key={k} className="flex flex-col items-start justify-center">
-              <label className="text-[7px] font-black uppercase text-slate-500 tracking-[0.2em] leading-none mb-1.5 ml-[1px]">
+            <div key={k} className="flex flex-col items-start gap-1">
+              <label className="text-[7px] font-black uppercase text-slate-500 tracking-[0.2em] leading-none ml-1">
                 {t[k]}
               </label>
-              <input
-                type="number"
-                value={config[k]}
-                onChange={e => setConfig({ ...config, [k]: parseInt(e.target.value) || 1 })}
-                className="w-10 bg-transparent border-none p-0 text-sm font-bold text-slate-100 focus:ring-0 leading-none h-4 appearance-none"
-              />
+              {/* CONTENEDOR DEL INPUT */}
+              <div className="relative group/input">
+                <input
+                  type="number"
+                  value={config[k]}
+                  onChange={e => setConfig({ ...config, [k]: parseInt(e.target.value) || 1 })}
+                  className="w-12 bg-slate-800/50 border border-slate-700 rounded-md px-2 py-1 text-[11px] font-bold text-slate-100 focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 focus:outline-none transition-all hover:bg-slate-800 appearance-none text-center"
+                />
+              </div>
             </div>
           ))}
         </div>
       </div>
 
       <div className="flex items-center gap-6">
-        {/* BOTÓN DE IDIOMA - REDISEÑADO */}
+        {/* BOTÓN DE IDIOMA */}
         <button 
           onClick={onToggleLang}
           className="group flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700 hover:border-blue-500/50 hover:bg-slate-800 transition-all"
@@ -90,7 +93,7 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
           </button>
         </div>
 
-        {/* BOTÓN RESET CON ICONO DE RELOAD */}
+        {/* BOTÓN RESET */}
         <button 
           onClick={onReset} 
           className="group flex items-center gap-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all border border-red-500/20 active:scale-95"

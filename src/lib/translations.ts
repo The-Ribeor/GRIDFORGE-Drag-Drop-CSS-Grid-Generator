@@ -12,7 +12,7 @@ export const translations = {
       author: "Por",
       button: "¡A forjar!"
     },
-    footer: { html: "Generado", css: "Generado", copy: "Copiar", copied: "Listo", crafted: "Elaborado con", by: "por" }
+    footer: { html: "Generado", css: "Generado", copy: "Copiar", copied: "Listo", crafted: "Elaborado con el", by: "por" }
   },
   en: {
     nav: { columns: "columns", rows: "rows", gap: "gap (px)", reset: "reset", tooltip: "View quick forge guide" },
