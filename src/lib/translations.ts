@@ -6,7 +6,9 @@ export const translations = {
       title: "Domina la forja de layouts",
       step1: "Haz clic en cualquier celda vacía para forjar un nuevo bloque.",
       step2: "Arrastra desde el centro de un bloque para reposicionarlo en la rejilla.",
-      step3: "Usa la esquina inferior para redimensionar el ancho y alto del elemento.",
+      step3: "Usa la esquina inferior para redimensionar el ancho y alto.",
+      step4: "Ajusta columnas, filas y gap en el panel superior para definir tu lienzo.",
+      step5: "¿Te equivocaste? Usa el botón Reset para limpiar toda la forja.",
       author: "Por",
       button: "¡A forjar!"
     },
@@ -19,7 +21,9 @@ export const translations = {
       title: "Master the layout forge",
       step1: "Click any empty cell to forge a new block.",
       step2: "Drag from the center of a block to reposition it in the grid.",
-      step3: "Use the bottom corner to resize the element's width and height.",
+      step3: "Use the bottom corner to resize width and height.",
+      step4: "Adjust columns, rows, and gap in the top panel to define your canvas.",
+      step5: "Made a mistake? Use the Reset button to clear the entire forge.",
       author: "By",
       button: "Start forging!"
     },
