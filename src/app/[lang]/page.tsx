@@ -1,5 +1,7 @@
 'use client';
 
+import { use } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { DndContext } from '@dnd-kit/core';
 import { Plus } from 'lucide-react';
 import { Navbar } from '@/components/ui/Navbar';
@@ -7,9 +9,13 @@ import { Footer } from '@/components/ui/Footer';
 import { HelpModal } from '@/components/ui/HelpModal';
 import { GridItem } from '@/components/grid/GridItem';
 import { useGridEditor } from '@/hook/useGridEditor';
+import { Language } from '@/lib/types';
 
+export default function FinalApp({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = use(params) as { lang: Language };
+  const router = useRouter();
+  const pathname = usePathname();
 
-export default function FinalApp() {
   const {
     config, setConfig,
     items, addItem, removeItem, resetItems,
@@ -19,11 +25,19 @@ export default function FinalApp() {
     showHelp, setShowHelp
   } = useGridEditor();
 
+  const toggleLang = () => {
+    const newLang = lang === 'es' ? 'en' : 'es';
+    const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
+    router.push(newPath);
+  };
+
   return (
     <div className="min-h-screen bg-[#1E293B] text-slate-300 font-sans flex flex-col">
-      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+      {showHelp && <HelpModal lang={lang} onClose={() => setShowHelp(false)} />}
       
       <Navbar 
+        lang={lang}
+        onToggleLang={toggleLang}
         config={config} 
         setConfig={setConfig} 
         onShowHelp={() => setShowHelp(true)} 
@@ -39,7 +53,6 @@ export default function FinalApp() {
               gap: `${config.gap}px` 
             }}>
             
-            {/* Fondo de la cuadrícula (Celdas vacías) */}
             {Array.from({ length: config.columns * config.rows }).map((_, i) => {
               const c = (i % config.columns) + 1, r = Math.floor(i / config.columns) + 1;
               return (
@@ -49,7 +62,6 @@ export default function FinalApp() {
               );
             })}
 
-            {/* Preview de lo que se está arrastrando */}
             {activeDragItem && dragPreview && (
               <div style={{
                 gridColumn: `${dragPreview.colStart} / span ${activeDragItem.colSpan}`,
@@ -60,21 +72,14 @@ export default function FinalApp() {
               }} />
             )}
 
-            {/* Los elementos reales del Grid */}
             {items.map(item => (
-              <GridItem 
-                key={item.id} 
-                item={item} 
-                config={config} 
-                onRemove={removeItem} 
-                onResizeEnd={onResizeEnd} 
-              />
+              <GridItem key={item.id} item={item} config={config} onRemove={removeItem} onResizeEnd={onResizeEnd} />
             ))}
           </div>
         </DndContext>
       </main>
 
-      <Footer items={items} config={config} />
+      <Footer lang={lang} items={items} config={config} />
     </div>
   );
 }

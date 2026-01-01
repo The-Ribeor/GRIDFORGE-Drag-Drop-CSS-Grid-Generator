@@ -1,16 +1,16 @@
 export const translations = {
   es: {
-    nav: { columns: "columnas", rows: "filas", gap: "espacio (px)", reset: "reset", tooltip: "Ver guía rápida de forjado" },
+    nav: { columns: "columnas", rows: "filas", gap: "espaciado (px)", reset: "Reiniciar", tooltip: "Ver guía rápida de forjado" },
     modal: {
       guide: "Gridforge Guide",
       title: "Domina la forja de layouts",
       step1: "Haz clic en cualquier celda vacía para forjar un nuevo bloque.",
       step2: "Arrastra desde el centro de un bloque para reposicionarlo en la rejilla.",
       step3: "Usa la esquina inferior para redimensionar el ancho y alto del elemento.",
-      author: "By",
+      author: "Por",
       button: "¡A forjar!"
     },
-    footer: { html: "SOURCE", css: "SOURCE", copy: "Copiar", copied: "Listo", crafted: "Crafted with" }
+    footer: { html: "Generado", css: "Generado", copy: "Copiar", copied: "Listo", crafted: "Elaborado con", by: "por" }
   },
   en: {
     nav: { columns: "columns", rows: "rows", gap: "gap (px)", reset: "reset", tooltip: "View quick forge guide" },
@@ -23,6 +23,6 @@ export const translations = {
       author: "By",
       button: "Start forging!"
     },
-    footer: { html: "SOURCE", css: "SOURCE", copy: "Copy", copied: "Done", crafted: "Crafted with" }
+    footer: { html: "SOURCE", css: "SOURCE", copy: "Copy", copied: "Done", crafted: "Crafted with", by: "by" }
   }
 };
