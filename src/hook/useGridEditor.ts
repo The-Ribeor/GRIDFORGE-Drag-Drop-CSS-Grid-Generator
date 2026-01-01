@@ -8,7 +8,7 @@ export function useGridEditor() {
   const [items, setItems] = useState<GridElement[]>([]);
   const [activeDragItem, setActiveDragItem] = useState<GridElement | null>(null);
   const [dragPreview, setDragPreview] = useState<{ colStart: number, rowStart: number } | null>(null);
-  const [showHelp, setShowHelp] = useState(true);
+  const [showHelp, setShowHelp] = useState(false);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 3 } }), 
