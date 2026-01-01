@@ -1,3 +1,5 @@
+export type Language = 'es' | 'en';
+
 export interface GridConfig {
   columns: number;
   rows: number;
