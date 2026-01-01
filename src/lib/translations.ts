@@ -38,7 +38,7 @@ export const translations = {
       rows: "filas", 
       gap: "espaciado (px)", 
       reset: "Reiniciar", 
-      default: "Valores", // O puedes usar "Reset" o "Por defecto"
+      default: "Reiniciar",
       tooltip: "Ver guía rápida de forjado" 
     },
     modal: {
@@ -60,7 +60,7 @@ export const translations = {
       rows: "rows", 
       gap: "gap (px)", 
       reset: "reset", 
-      default: "default", 
+      default: "reset", 
       tooltip: "View quick forge guide" 
     },
     modal: {
