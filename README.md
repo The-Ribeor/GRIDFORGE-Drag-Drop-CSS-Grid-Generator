@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GRIDFORGE  
+**Professional Drag & Drop CSS Grid Layout Engine**
 
-## Getting Started
+GRIDFORGE es una herramienta visual de alto rendimiento diseñada para forjar estructuras de CSS Grid complejas de forma intuitiva.  
+Olvídate de calcular áreas manualmente; simplemente dibuja, arrastra y exporta.
 
-First, run the development server:
+---
+
+## ✨ Características Principales
+
+- **Matriz Dinámica:** Configura columnas, filas y gaps en tiempo real.
+- **Interacción Fluida:** Sistema de arrastre (Drag & Drop) optimizado con retroalimentación visual de destino.
+- **Resize Inteligente:** Redimensiona bloques desde la esquina con previsualización de crecimiento y decrecimiento.
+- **Generador de Código:** Obtén instantáneamente el HTML y CSS (usando `grid-area`) listo para copiar y pegar en tu proyecto.
+- **Interfaz de Alta Precisión:** Diseñada para desarrolladores con un modo oscuro profesional y estética minimalista.
+
+---
+
+## 🚀 Tecnologías Utilizadas
+
+- **Framework:** Next.js 15 (App Router)
+- **Lenguaje:** TypeScript
+- **Drag & Drop:** @dnd-kit/core
+- **Estilos:** Tailwind CSS
+- **Iconografía:** Lucide React
+
+---
+
+## 🛠️ Instalación y Uso
 
 ```bash
+git clone https://github.com/tu-usuario/gridforge.git
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre en tu navegador:  
+👉 http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📖 Guía de Uso Rápido
 
-## Learn More
+- **Crear:** Haz clic en cualquier celda vacía con el icono `+` para generar un nuevo bloque.
+- **Mover:** Arrastra el bloque desde su centro para cambiar su posición inicial.  
+  El "fantasma" punteado te indicará dónde aterrizará.
+- **Redimensionar:** Usa el controlador de la esquina inferior derecha del bloque para expandirlo o contraerlo.
+- **Exportar:** Desplázate al footer para ver el código fuente generado automáticamente.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🖋️ Créditos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Desarrollado por **The Ribeor Studio**
 
-## Deploy on Vercel
+- **GitHub:** @Diegoberrio1601  
+- **LinkedIn:** diegoberrio1601  
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+© 2024 **GRIDFORGE** — *Crafting Digital Systems.*
