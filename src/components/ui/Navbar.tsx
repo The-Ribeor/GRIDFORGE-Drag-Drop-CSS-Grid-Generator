@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { HelpCircle, Github, Linkedin, Instagram, Languages, RotateCcw, Eraser } from 'lucide-react';
 import { GridConfig, Language } from '@/lib/types';
 import { translations } from '@/lib/translations';
+import Image from 'next/image';
 
 interface NavbarProps {
   config: GridConfig;
@@ -45,8 +46,24 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
   return (
     <nav className="h-16 border-b border-slate-700 bg-[#1E293B]/95 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-[100]">
       <div className="flex items-center gap-10">
-        <div className="font-black text-white tracking-widest text-sm uppercase italic shrink-0">GRIDFORGE</div>
 
+        <div className="flex items-center gap-3 shrink-0 group cursor-pointer">
+          <div className="transition-transform group-hover:scale-110">
+            <Image
+              src="/logo.png"
+              alt="GridForge Logo"
+              width={40}  
+              height={40} 
+              priority    
+              className="object-contain"
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-black text-white tracking-widest text-sm uppercase italic leading-none">
+              GRID FORGE
+            </span>
+          </div>
+        </div>
         {/* BARRA DE HERRAMIENTAS DE CONFIGURACIÓN */}
         <div className="flex items-center gap-4 border-l border-slate-700 pl-8">
           <div className="flex gap-3 items-center bg-slate-900/30 p-1.5 rounded-xl border border-slate-800/50 shadow-inner">
