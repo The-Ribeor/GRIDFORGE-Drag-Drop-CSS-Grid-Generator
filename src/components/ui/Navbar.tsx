@@ -52,10 +52,12 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
             <Image
               src="/logo.png"
               alt="GridForge Logo"
-              width={40}  
-              height={40} 
-              priority    
-              className="object-contain"
+              width={40}
+              height={40}
+              priority
+              // 'rounded-lg' para bordes suaves o 'rounded-full' si quieres un círculo
+              // 'overflow-hidden' asegura que la imagen no se salga de las esquinas redondeadas
+              className="object-contain rounded-lg overflow-hidden"
             />
           </div>
           <div className="flex flex-col">
