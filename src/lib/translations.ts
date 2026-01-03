@@ -1,5 +1,9 @@
 export const translations = {
   es: {
+    seo: {
+      title: "GRIDFORGE | Generador de CSS Grid Interactivo",
+      description: "La herramienta definitiva para forjar layouts de CSS Grid visualmente. Arrastra, redimensiona y genera código HTML/CSS limpio."
+    },
     nav: { 
       columns: "columnas", 
       rows: "filas", 
@@ -22,6 +26,10 @@ export const translations = {
     footer: { html: "Generado", css: "Generado", copy: "Copiar", copied: "Listo", crafted: "Elaborado con el", by: "por" }
   },
   en: {
+    seo: {
+      title: "GRIDFORGE | Interactive CSS Grid Generator",
+      description: "The ultimate tool to forge CSS Grid layouts visually. Drag, resize, and generate clean HTML/CSS code instantly."
+    },
     nav: { 
       columns: "columns", 
       rows: "rows", 
