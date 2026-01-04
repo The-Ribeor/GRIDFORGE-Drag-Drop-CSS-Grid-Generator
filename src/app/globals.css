@@ -1,4 +1,4 @@
-@import "tailwindcss";
+/* @import "tailwindcss";
 
 :root {
   --background: #ffffff;
@@ -18,4 +18,52 @@ body {
 
 .animate-bounce-subtle {
   animation: bounce-subtle 2s infinite;
+} */
+
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* --- TEMA DÍA (Light Mode) --- */
+    /* Un gris muy suave para el fondo y blanco puro para las tarjetas */
+    --app-bg: #F1F5F9;           /* Slate 100 */
+    --nav-bg: rgba(241, 245, 249, 0.9);
+    --card-bg: #FFFFFF;          /* Blanco */
+    --item-bg: #E2E8F0;          /* Slate 200 (Bloques del grid) */
+    --border-main: #CBD5E1;      /* Slate 300 */
+    --text-title: #0F172A;       /* Slate 900 */
+    --text-body: #475569;        /* Slate 600 */
+    --grid-plus: #94A3B8;        /* Color para el icono + en las celdas vacías */
+  }
+
+  [data-theme='dark'] {
+    /* --- TEMA NOCHE (Dark Mode - Tus colores originales) --- */
+    --app-bg: #1E293B;           /* El fondo principal que ya usas */
+    --nav-bg: rgba(30, 41, 59, 0.95);
+    --card-bg: #0F172A;          /* El fondo del canvas */
+    --item-bg: #334155;          /* El fondo de los GridItems */
+    --border-main: #334155;      /* Bordes generales */
+    --text-title: #F8FAFC;       /* Texto blanco/slate 50 */
+    --text-body: #CBD5E1;        /* Texto gris claro */
+    --grid-plus: #1E293B;        /* Icono + sutil en el fondo oscuro */
+  }
+}
+
+/* Conectamos las variables con Tailwind */
+@theme {
+  --color-app-bg: var(--app-bg);
+  --color-nav-bg: var(--nav-bg);
+  --color-card-bg: var(--card-bg);
+  --color-item-bg: var(--item-bg);
+  --color-border-main: var(--border-main);
+  --color-text-title: var(--text-title);
+  --color-text-body: var(--text-body);
+  --color-grid-plus: var(--grid-plus);
+}
+
+/* Transición suave para que el cambio de tema no sea brusco */
+body {
+  background-color: var(--app-bg);
+  color: var(--text-body);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }

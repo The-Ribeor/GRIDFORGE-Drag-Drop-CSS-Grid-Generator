@@ -26,9 +26,6 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
     showHelp, setShowHelp
   } = useGridEditor();
 
-  // CALCULAMOS LOS ITEMS RENUMERADOS:
-  // Esta constante asegura que tanto la visualización como el generador de código (Footer)
-  // vean los mismos números basados en la posición actual.
   const reindexedItems = useMemo(() => {
     return [...items]
       .sort((a, b) => a.rowStart - b.rowStart || a.colStart - b.colStart)
@@ -45,7 +42,8 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
   };
 
   return (
-    <div className="min-h-screen bg-[#1E293B] text-slate-300 font-sans flex flex-col">
+    /* CAMBIADO: bg-[#1E293B] -> bg-app-bg | text-slate-300 -> text-text-body */
+    <div className="min-h-screen bg-app-bg text-text-body font-sans flex flex-col transition-colors duration-300">
       {showHelp && <HelpModal lang={lang} onClose={() => setShowHelp(false)} />}
 
       <Navbar
@@ -64,9 +62,10 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
           onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
         >
+          {/* CAMBIADO: bg-[#0F172A] -> bg-card-bg | border-slate-800 -> border-border-main */}
           <div
             id="grid-canvas"
-            className="grid bg-[#0F172A] border border-slate-800 p-2 rounded-2xl shadow-2xl mx-auto w-full max-w-5xl relative"
+            className="grid bg-card-bg border border-border-main p-2 rounded-2xl shadow-2xl mx-auto w-full max-w-5xl relative transition-colors duration-300"
             style={{
               gridTemplateColumns: `repeat(${config.columns}, 1fr)`,
               gridTemplateRows: `repeat(${config.rows}, 90px)`,
@@ -83,9 +82,11 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
                   key={`cell-${i}`}
                   onClick={() => addItem(c, r)}
                   style={{ gridColumn: c, gridRow: r }}
-                  className="border border-slate-800/50 hover:bg-slate-800/40 rounded-lg transition-all flex items-center justify-center cursor-crosshair group shadow-inner"
+                  /* CAMBIADO: border-slate-800/50 -> border-border-main/50 | hover:bg-slate-800/40 -> hover:bg-app-bg/50 */
+                  className="border border-border-main/50 hover:bg-app-bg/50 rounded-lg transition-all flex items-center justify-center cursor-crosshair group shadow-inner"
                 >
-                  <Plus size={14} className="text-slate-800/30 group-hover:text-slate-600" />
+                  {/* CAMBIADO: text-slate-800/30 -> text-grid-plus | group-hover:text-slate-600 -> group-hover:text-blue-500 */}
+                  <Plus size={14} className="text-grid-plus group-hover:text-blue-500 transition-colors" />
                 </div>
               );
             })}
@@ -95,8 +96,10 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
               <div style={{
                 gridColumn: `${dragPreview.colStart} / span ${activeDragItem.colSpan}`,
                 gridRow: `${dragPreview.rowStart} / span ${activeDragItem.rowSpan}`,
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                border: '2px dashed rgba(255, 255, 255, 0.3)',
+                /* CAMBIADO: Ajustado para que funcione en ambos temas mediante opacidad */
+                backgroundColor: 'var(--color-text-title)', 
+                opacity: 0.08,
+                border: '2px dashed var(--color-text-body)',
                 zIndex: 5,
                 borderRadius: '8px',
                 pointerEvents: 'none'
@@ -106,7 +109,6 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
             {/* Renderizado con items re-indexados */}
             {reindexedItems.map((item) => {
               const isDraggingThis = activeDragItem?.id === item.id;
-              // Si se está arrastrando, mantenemos su posición visual original para evitar jitter
               const displayItem = isDraggingThis ? { ...activeDragItem, number: item.number } : item;
 
               return (
@@ -126,7 +128,6 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
       </main>
 
       <SocialSidebar/>
-        {/* AHORA PASAMOS LOS ITEMS RE-INDEXADOS AL FOOTER */}
       <Footer lang={lang} items={reindexedItems} config={config} />
     </div>
   );

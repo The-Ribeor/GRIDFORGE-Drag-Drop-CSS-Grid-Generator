@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { translations } from "@/lib/translations";
+import { ThemeProvider } from "next-themes";
 import "../globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       url: `${BASE_URL}/${currentLang}`,
       images: [
         {
-          url: `/logo.png`, // Next.js lo busca en public/logo.png
+          url: `/logo.png`, 
           width: 512,
           height: 512,
           alt: "GRIDFORGE Logo",
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       ],
     },
     twitter: {
-      card: "summary", // 'summary' es mejor para logos cuadrados
+      card: "summary", 
       title: t.title,
       description: t.description,
       images: [`${BASE_URL}/logo.png`],
@@ -87,7 +88,7 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang={currentLang} className="scroll-smooth">
+    <html lang={currentLang} className="scroll-smooth" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -96,9 +97,11 @@ export default async function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/logo.png" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#1E293B] selection:bg-blue-500/30`}>
-        <h1 className="sr-only">{translations[currentLang].seo.title}</h1>
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-app-bg selection:bg-blue-500/30 transition-colors duration-300`}>
+        <ThemeProvider attribute="data-theme" defaultTheme="dark">
+          <h1 className="sr-only">{translations[currentLang].seo.title}</h1>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

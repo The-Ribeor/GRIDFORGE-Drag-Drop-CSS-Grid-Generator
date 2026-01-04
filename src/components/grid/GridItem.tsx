@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { X } from 'lucide-react';
@@ -23,7 +25,6 @@ export const GridItem = React.memo(({
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: item.id });
   const [resizePreview, setResizePreview] = useState<{ col: number, row: number } | null>(null);
 
-  // Estilo dinámico para dnd-kit y posicionamiento en grid
   const style = {
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     gridColumn: `${item.colStart} / span ${item.colSpan}`,
@@ -36,7 +37,6 @@ export const GridItem = React.memo(({
     e.preventDefault();
     e.stopPropagation();
     
-    // 1. Notificar al padre que guarde el estado actual (Memoria elástica)
     onResizeStart();
 
     const startX = e.clientX;
@@ -54,10 +54,7 @@ export const GridItem = React.memo(({
       const newCol = Math.max(1, initialColSpan + Math.round((mE.clientX - startX) / cw));
       const newRow = Math.max(1, initialRowSpan + Math.round((mE.clientY - startY) / ch));
 
-      // 2. Actualizar preview visual local
       setResizePreview({ col: newCol, row: newRow });
-      
-      // 3. Notificar al padre para empujar otros bloques en tiempo real
       onResizeUpdate(item.id, newCol, newRow);
     };
 
@@ -69,8 +66,6 @@ export const GridItem = React.memo(({
       if (grid) {
         const finalCol = Math.max(1, initialColSpan + Math.round((mE.clientX - startX) / (grid.clientWidth / config.columns)));
         const finalRow = Math.max(1, initialRowSpan + Math.round((mE.clientY - startY) / (90 + config.gap)));
-        
-        // 4. Confirmar posición final
         onResizeEnd(item.id, finalCol, finalRow);
       }
       setResizePreview(null);
@@ -82,7 +77,7 @@ export const GridItem = React.memo(({
 
   return (
     <>
-      {/* Rectángulo de previsualización (el borde azul dinámico) */}
+      {/* Rectángulo de previsualización (Redimensión) */}
       {resizePreview && (
         <div style={{
           gridColumn: `${item.colStart} / span ${resizePreview.col}`,
@@ -96,18 +91,20 @@ export const GridItem = React.memo(({
       )}
 
       {/* Bloque principal del Item */}
+      {/* CAMBIADO: bg-[#334155] -> bg-item-bg | border-slate-500 -> border-border-main */}
       <div 
         ref={setNodeRef} 
         style={style} 
-        className={`relative bg-[#334155] border border-slate-500 rounded-lg flex items-center justify-center text-2xl font-bold group ${
-          isDragging ? 'shadow-2xl ring-2 ring-slate-400 z-50 opacity-90' : 'hover:border-slate-300 shadow-lg'
+        className={`relative bg-item-bg border border-border-main rounded-lg flex items-center justify-center text-2xl font-bold group transition-colors duration-300 ${
+          isDragging ? 'shadow-2xl ring-2 ring-blue-500 z-50 opacity-90' : 'hover:border-blue-500 shadow-lg'
         }`}
       >
-        {/* Área de arrastre (Draggable) */}
+        {/* Área de arrastre */}
+        {/* CAMBIADO: text-slate-100 -> text-text-title */}
         <div 
           {...listeners} 
           {...attributes} 
-          className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing text-slate-100 italic select-none"
+          className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing text-text-title italic select-none"
         >
           {item.number}
         </div>
@@ -120,12 +117,13 @@ export const GridItem = React.memo(({
           <X size={10} />
         </button>
 
-        {/* Tirador de redimensión (Resize Handle) */}
+        {/* Tirador de redimensión */}
         <div 
           onMouseDown={handleResizeStart} 
           className="absolute bottom-0 right-0 w-10 h-10 cursor-nwse-resize z-[60] flex items-end justify-end p-2 rounded-br-lg"
         >
-          <div className="w-4 h-4 border-r-4 border-b-4 border-slate-400 group-hover:border-white transition-colors rounded-br-sm" />
+          {/* CAMBIADO: border-slate-400 -> border-border-main | group-hover:border-blue-500 */}
+          <div className="w-4 h-4 border-r-4 border-b-4 border-border-main group-hover:border-blue-500 transition-colors rounded-br-sm" />
         </div>
       </div>
     </>
