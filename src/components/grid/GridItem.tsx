@@ -25,6 +25,18 @@ export const GridItem = React.memo(({
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: item.id });
   const [resizePreview, setResizePreview] = useState<{ col: number, row: number } | null>(null);
 
+  // Array de clases de Tailwind vinculadas a las variables del globals.css
+  const colorClasses = [
+    'bg-item-1',
+    'bg-item-2',
+    'bg-item-3',
+    'bg-item-4',
+    'bg-item-5'
+  ];
+
+  // Seleccionamos la clase según el número del item
+  const selectedBgClass = colorClasses[(item.number - 1) % colorClasses.length];
+
   const style = {
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     gridColumn: `${item.colStart} / span ${item.colSpan}`,
@@ -91,16 +103,14 @@ export const GridItem = React.memo(({
       )}
 
       {/* Bloque principal del Item */}
-      {/* CAMBIADO: bg-[#334155] -> bg-item-bg | border-slate-500 -> border-border-main */}
       <div 
         ref={setNodeRef} 
         style={style} 
-        className={`relative bg-item-bg border border-border-main rounded-lg flex items-center justify-center text-2xl font-bold group transition-colors duration-300 ${
+        className={`relative ${selectedBgClass} border border-border-main rounded-lg flex items-center justify-center text-2xl font-bold group transition-all duration-300 ${
           isDragging ? 'shadow-2xl ring-2 ring-blue-500 z-50 opacity-90' : 'hover:border-blue-500 shadow-lg'
         }`}
       >
         {/* Área de arrastre */}
-        {/* CAMBIADO: text-slate-100 -> text-text-title */}
         <div 
           {...listeners} 
           {...attributes} 
@@ -122,7 +132,6 @@ export const GridItem = React.memo(({
           onMouseDown={handleResizeStart} 
           className="absolute bottom-0 right-0 w-10 h-10 cursor-nwse-resize z-[60] flex items-end justify-end p-2 rounded-br-lg"
         >
-          {/* CAMBIADO: border-slate-400 -> border-border-main | group-hover:border-blue-500 */}
           <div className="w-4 h-4 border-r-4 border-b-4 border-border-main group-hover:border-blue-500 transition-colors rounded-br-sm" />
         </div>
       </div>

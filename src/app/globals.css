@@ -1,55 +1,45 @@
-/* @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@keyframes bounce-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-.animate-bounce-subtle {
-  animation: bounce-subtle 2s infinite;
-} */
-
 @import "tailwindcss";
 
 @layer base {
   :root {
-    /* --- TEMA DÍA (Light Mode) --- */
-    /* Un gris muy suave para el fondo y blanco puro para las tarjetas */
-    --app-bg: #F1F5F9;           /* Slate 100 */
+    /* --- TEMA DÍA --- */
+    --app-bg: #F1F5F9;
     --nav-bg: rgba(241, 245, 249, 0.9);
-    --card-bg: #FFFFFF;          /* Blanco */
-    --item-bg: #E2E8F0;          /* Slate 200 (Bloques del grid) */
-    --border-main: #CBD5E1;      /* Slate 300 */
-    --text-title: #0F172A;       /* Slate 900 */
-    --text-body: #475569;        /* Slate 600 */
-    --grid-plus: #94A3B8;        /* Color para el icono + en las celdas vacías */
+    --card-bg: #FFFFFF;
+    --item-bg: #E2E8F0;
+    --border-main: #CBD5E1;
+    --text-title: #0F172A;
+    --text-body: #475569;
+    --grid-plus: #94A3B8;
+
+    /* Modo Claro: Pasteles vibrantes y limpios */
+    --item-c1: #E0F2FE; /* Cyan Pastel */
+    --item-c2: #F3E8FF; /* Violeta Pastel */
+    --item-c3: #DCFCE7; /* Esmeralda Pastel */
+    --item-c4: #FEF9C3; /* Sol Pastel */
+    --item-c5: #FFE4E6; /* Rosa Pastel */
   }
 
   [data-theme='dark'] {
-    /* --- TEMA NOCHE (Dark Mode - Tus colores originales) --- */
-    --app-bg: #1E293B;           /* El fondo principal que ya usas */
+    /* --- TEMA NOCHE --- */
+    --app-bg: #1E293B;
     --nav-bg: rgba(30, 41, 59, 0.95);
-    --card-bg: #0F172A;          /* El fondo del canvas */
-    --item-bg: #334155;          /* El fondo de los GridItems */
-    --border-main: #334155;      /* Bordes generales */
-    --text-title: #F8FAFC;       /* Texto blanco/slate 50 */
-    --text-body: #CBD5E1;        /* Texto gris claro */
-    --grid-plus: #1E293B;        /* Icono + sutil en el fondo oscuro */
+    --card-bg: #0F172A;
+    --item-bg: #334155;
+    --border-main: #334155;
+    --text-title: #F8FAFC;
+    --text-body: #CBD5E1;
+    --grid-plus: #1E293B;
+
+    /* Modo Oscuro: Colores Gema (Vibrantes pero profundos) */
+    --item-c1: #075985; /* Zafiro */
+    --item-c2: #581C87; /* Amatista */
+    --item-c3: #065F46; /* Esmeralda */
+    --item-c4: #854D0E; /* Ámbar */
+    --item-c5: #9F1239; /* Rubí */
   }
 }
 
-/* Conectamos las variables con Tailwind */
 @theme {
   --color-app-bg: var(--app-bg);
   --color-nav-bg: var(--nav-bg);
@@ -59,11 +49,10 @@ body {
   --color-text-title: var(--text-title);
   --color-text-body: var(--text-body);
   --color-grid-plus: var(--grid-plus);
-}
-
-/* Transición suave para que el cambio de tema no sea brusco */
-body {
-  background-color: var(--app-bg);
-  color: var(--text-body);
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  
+  --color-item-1: var(--item-c1);
+  --color-item-2: var(--item-c2);
+  --color-item-3: var(--item-c3);
+  --color-item-4: var(--item-c4);
+  --color-item-5: var(--item-c5);
 }
