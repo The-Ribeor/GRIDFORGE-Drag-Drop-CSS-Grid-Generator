@@ -1,4 +1,6 @@
-import { useState, useCallback, useRef } from 'react';
+'use client';
+
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { DragStartEvent, DragMoveEvent, DragEndEvent, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { GridConfig, GridElement } from '@/lib/types';
 import { resolveDisplacement } from '@/lib/grid-utils';
@@ -10,7 +12,30 @@ export function useGridEditor() {
   const [dragPreview, setDragPreview] = useState<{ colStart: number, rowStart: number } | null>(null);
   const [showHelp, setShowHelp] = useState(false);
   
+  const isHydrated = useRef(false);
   const originalItemsRef = useRef<GridElement[]>([]);
+
+  // 1. CARGAR DATOS (Solo al montar el cliente)
+  useEffect(() => {
+    const savedItems = localStorage.getItem('gridforge_items');
+    const savedConfig = localStorage.getItem('gridforge_config');
+    
+    if (savedItems) {
+      try { setItems(JSON.parse(savedItems)); } catch (e) { console.error(e); }
+    }
+    if (savedConfig) {
+      try { setConfig(JSON.parse(savedConfig)); } catch (e) { console.error(e); }
+    }
+    isHydrated.current = true;
+  }, []);
+
+  // 2. GUARDAR DATOS (Solo si ya se cargaron los previos)
+  useEffect(() => {
+    if (isHydrated.current) {
+      localStorage.setItem('gridforge_items', JSON.stringify(items));
+      localStorage.setItem('gridforge_config', JSON.stringify(config));
+    }
+  }, [items, config]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 3 } }), 
@@ -37,9 +62,6 @@ export function useGridEditor() {
     const newRowStart = Math.max(1, Math.min(activeDragItem.rowStart + Math.round(e.delta.y / ch), config.rows - activeDragItem.rowSpan + 1));
 
     setDragPreview({ colStart: newColStart, rowStart: newRowStart });
-    
-    // Actualizamos los otros items para que se aparten, pero el activo mantiene su ID en la posición original
-    // para evitar el salto visual del transform
     setItems(resolveDisplacement(originalItemsRef.current, { ...activeDragItem, colStart: newColStart, rowStart: newRowStart }, config));
   };
 
@@ -79,7 +101,12 @@ export function useGridEditor() {
   };
 
   const removeItem = (id: string) => setItems(prev => prev.filter(i => i.id !== id));
-  const resetItems = () => setItems([]);
+  
+  const resetItems = () => {
+    setItems([]);
+    localStorage.removeItem('gridforge_items');
+    localStorage.removeItem('gridforge_config');
+  };
 
   return {
     config, setConfig, items, addItem, removeItem, resetItems,
