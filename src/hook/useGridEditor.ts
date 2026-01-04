@@ -15,29 +15,22 @@ export function useGridEditor() {
   const isHydrated = useRef(false);
   const originalItemsRef = useRef<GridElement[]>([]);
 
-  // 1. CARGAR DATOS: Al montar, recuperamos del localStorage
   useEffect(() => {
     const savedItems = localStorage.getItem('gridforge_items_v2');
     const savedConfig = localStorage.getItem('gridforge_config_v2');
-    
     if (savedItems) {
       try {
         const parsed = JSON.parse(savedItems);
         if (parsed && parsed.length > 0) setItems(parsed);
-      } catch (e) { console.error("Error loading items", e); }
+      } catch (e) { console.error(e); }
     }
     if (savedConfig) {
-      try { setConfig(JSON.parse(savedConfig)); } catch (e) { console.error("Error loading config", e); }
+      try { setConfig(JSON.parse(savedConfig)); } catch (e) { console.error(e); }
     }
-
-    // Bloqueamos el guardado por 50ms para que el estado de React se estabilice
-    const timer = setTimeout(() => {
-      isHydrated.current = true;
-    }, 50);
+    const timer = setTimeout(() => { isHydrated.current = true; }, 50);
     return () => clearTimeout(timer);
   }, []);
 
-  // 2. GUARDAR DATOS: Solo si ya terminó la carga inicial
   useEffect(() => {
     if (isHydrated.current) {
       localStorage.setItem('gridforge_items_v2', JSON.stringify(items));
@@ -47,7 +40,7 @@ export function useGridEditor() {
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 3 } }), 
-    useSensor(TouchSensor)
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } })
   );
 
   const handleDragStart = (e: DragStartEvent) => {
@@ -69,27 +62,21 @@ export function useGridEditor() {
     const newColStart = Math.max(1, Math.min(activeDragItem.colStart + Math.round(e.delta.x / cw), config.columns - activeDragItem.colSpan + 1));
     const newRowStart = Math.max(1, Math.min(activeDragItem.rowStart + Math.round(e.delta.y / ch), config.rows - activeDragItem.rowSpan + 1));
 
-    setDragPreview({ colStart: newColStart, rowStart: newRowStart });
-    setItems(resolveDisplacement(originalItemsRef.current, { ...activeDragItem, colStart: newColStart, rowStart: newRowStart }, config));
+    if (newColStart !== dragPreview?.colStart || newRowStart !== dragPreview?.rowStart) {
+      setDragPreview({ colStart: newColStart, rowStart: newRowStart });
+      setItems(resolveDisplacement(originalItemsRef.current, { ...activeDragItem, colStart: newColStart, rowStart: newRowStart }, config));
+    }
   };
 
-  const handleDragEnd = (e: DragEndEvent) => {
-    if (activeDragItem && dragPreview) {
-      setItems(prev => resolveDisplacement(prev, {
-        ...activeDragItem,
-        colStart: dragPreview.colStart,
-        rowStart: dragPreview.rowStart
-      }, config));
-    }
+  const handleDragEnd = () => {
+    // Al soltar, simplemente limpiamos. 
+    // El estado ya se actualizó en el último DragMove, así que el bloque ya está en su sitio.
     setActiveDragItem(null);
     setDragPreview(null);
     originalItemsRef.current = [];
   };
 
-  const onResizeStart = useCallback(() => {
-    originalItemsRef.current = [...items];
-  }, [items]);
-
+  const onResizeStart = useCallback(() => { originalItemsRef.current = [...items]; }, [items]);
   const onResizeUpdate = useCallback((id: string, colSpan: number, rowSpan: number) => {
     const item = originalItemsRef.current.find(i => i.id === id);
     if (!item) return;
@@ -109,9 +96,8 @@ export function useGridEditor() {
   };
 
   const removeItem = (id: string) => setItems(prev => prev.filter(i => i.id !== id));
-  
   const resetItems = () => {
-    isHydrated.current = false; // Bloqueamos el guardado automático
+    isHydrated.current = false;
     setItems([]);
     localStorage.removeItem('gridforge_items_v2');
     localStorage.removeItem('gridforge_config_v2');
