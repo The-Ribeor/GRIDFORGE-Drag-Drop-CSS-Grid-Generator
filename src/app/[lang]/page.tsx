@@ -27,7 +27,7 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
     showHelp, setShowHelp
   } = useGridEditor();
 
-  // 1. Evitar el flash blanco forzando a React a esperar el montaje
+  // Bloqueo de hidratación para evitar parpadeos
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -41,17 +41,15 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
       }));
   }, [items]);
 
-  // 2. Navegación silenciosa para no perder el estado visual
   const toggleLang = () => {
     const newLang = lang === 'es' ? 'en' : 'es';
     const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
+    // replace y scroll: false mantienen la posición y suavizan el cambio
     router.replace(newPath, { scroll: false });
   };
 
-  // Mientras el cliente no está listo, devolvemos un fondo oscuro idéntico al tema
-  if (!mounted) {
-    return <div className="min-h-screen bg-[#0F172A]" />;
-  }
+  // Si no ha montado, mostramos el color de fondo oscuro de tu app para evitar el flash blanco
+  if (!mounted) return <div className="min-h-screen bg-[#0F172A]" />;
 
   return (
     <div className="min-h-screen bg-app-bg text-text-body font-sans flex flex-col transition-none">

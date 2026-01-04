@@ -15,25 +15,33 @@ export function useGridEditor() {
   const isHydrated = useRef(false);
   const originalItemsRef = useRef<GridElement[]>([]);
 
-  // 1. CARGAR DATOS (Solo al montar el cliente)
+  // 1. CARGAR DATOS: Al montar, recuperamos del localStorage
   useEffect(() => {
-    const savedItems = localStorage.getItem('gridforge_items');
-    const savedConfig = localStorage.getItem('gridforge_config');
+    const savedItems = localStorage.getItem('gridforge_items_v2');
+    const savedConfig = localStorage.getItem('gridforge_config_v2');
     
     if (savedItems) {
-      try { setItems(JSON.parse(savedItems)); } catch (e) { console.error(e); }
+      try {
+        const parsed = JSON.parse(savedItems);
+        if (parsed && parsed.length > 0) setItems(parsed);
+      } catch (e) { console.error("Error loading items", e); }
     }
     if (savedConfig) {
-      try { setConfig(JSON.parse(savedConfig)); } catch (e) { console.error(e); }
+      try { setConfig(JSON.parse(savedConfig)); } catch (e) { console.error("Error loading config", e); }
     }
-    isHydrated.current = true;
+
+    // Bloqueamos el guardado por 50ms para que el estado de React se estabilice
+    const timer = setTimeout(() => {
+      isHydrated.current = true;
+    }, 50);
+    return () => clearTimeout(timer);
   }, []);
 
-  // 2. GUARDAR DATOS (Solo si ya se cargaron los previos)
+  // 2. GUARDAR DATOS: Solo si ya terminó la carga inicial
   useEffect(() => {
     if (isHydrated.current) {
-      localStorage.setItem('gridforge_items', JSON.stringify(items));
-      localStorage.setItem('gridforge_config', JSON.stringify(config));
+      localStorage.setItem('gridforge_items_v2', JSON.stringify(items));
+      localStorage.setItem('gridforge_config_v2', JSON.stringify(config));
     }
   }, [items, config]);
 
@@ -103,9 +111,11 @@ export function useGridEditor() {
   const removeItem = (id: string) => setItems(prev => prev.filter(i => i.id !== id));
   
   const resetItems = () => {
+    isHydrated.current = false; // Bloqueamos el guardado automático
     setItems([]);
-    localStorage.removeItem('gridforge_items');
-    localStorage.removeItem('gridforge_config');
+    localStorage.removeItem('gridforge_items_v2');
+    localStorage.removeItem('gridforge_config_v2');
+    setTimeout(() => isHydrated.current = true, 50);
   };
 
   return {
