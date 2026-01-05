@@ -14,7 +14,7 @@ interface NavbarProps {
   onReset: () => void;
   lang: Language;
   onToggleLang: () => void;
-  onShowExport: () => void; 
+  onShowExport: () => void; // Propiedad necesaria para el build
 }
 
 export const Navbar = ({ 
@@ -43,8 +43,11 @@ export const Navbar = ({
 
   const handleConfigChange = (key: keyof GridConfig, value: string) => {
     let num = parseInt(value) || 0;
-    if (num > 50 && (key === 'columns' || key === 'rows')) num = 50;
-    if (num > 100 && key === 'gap') num = 100;
+    
+    // RESTRICTORES: Máximo 12 para columnas/filas y 100 para el gap
+    if ((key === 'columns' || key === 'rows') && num > 12) num = 12;
+    if (key === 'gap' && num > 100) num = 100;
+    
     setConfig({ ...config, [key]: num });
   };
 
@@ -87,7 +90,7 @@ export const Navbar = ({
                 <input
                   type="number"
                   min="1"
-                  max="50"
+                  max={k === 'gap' ? "100" : "12"}
                   value={config[k]}
                   onChange={e => handleConfigChange(k, e.target.value)}
                   className="w-10 md:w-14 bg-app-bg border border-border-main rounded-lg px-1 md:px-2 py-1 text-[10px] md:text-[11px] font-bold text-text-title focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all hover:bg-card-bg appearance-none text-center"
@@ -113,7 +116,7 @@ export const Navbar = ({
 
       <div className="flex items-center gap-2 md:gap-6">
         
-        {/* BOTÓN DE TEMA */}
+        {/* TEMA */}
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           className="p-2 rounded-xl bg-card-bg border border-border-main text-text-body hover:text-blue-500 hover:border-blue-500/50 transition-all active:scale-90 h-9 w-9 flex items-center justify-center"
