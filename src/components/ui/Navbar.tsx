@@ -14,16 +14,24 @@ interface NavbarProps {
   onReset: () => void;
   lang: Language;
   onToggleLang: () => void;
+  onShowExport: () => void; 
 }
 
-export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleLang }: NavbarProps) => {
+export const Navbar = ({ 
+  config, 
+  setConfig, 
+  onShowHelp, 
+  onReset, 
+  lang, 
+  onToggleLang,
+  onShowExport 
+}: NavbarProps) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const { theme, setTheme } = useTheme();
   const t = translations[lang].nav;
 
   const defaultConfig: GridConfig = { columns: 5, rows: 5, gap: 8 };
 
-  // Manejo de tooltips
   useEffect(() => {
     const timer = setTimeout(() => setShowTooltip(true), 1000);
     const hideTimer = setTimeout(() => setShowTooltip(false), 5000);
@@ -35,11 +43,8 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
 
   const handleConfigChange = (key: keyof GridConfig, value: string) => {
     let num = parseInt(value) || 0;
-    
-    // INTEGRADO: Restricción a 12 para compatibilidad con Tailwind estándar
-    if ((key === 'columns' || key === 'rows') && num > 12) num = 12;
-    if (key === 'gap' && num > 100) num = 100;
-    
+    if (num > 50 && (key === 'columns' || key === 'rows')) num = 50;
+    if (num > 100 && key === 'gap') num = 100;
     setConfig({ ...config, [key]: num });
   };
 
@@ -49,7 +54,7 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
     <nav className="h-20 md:h-16 border-b border-border-main bg-nav-bg backdrop-blur-md px-4 md:px-8 flex items-center justify-between sticky top-0 z-[100] transition-all">
       <div className="flex items-center gap-3 md:gap-10">
 
-        {/* LOGO - Respetando versión original */}
+        {/* LOGO */}
         <div className="flex items-center gap-2 md:gap-3 shrink-0 group cursor-pointer">
           <div className="transition-transform group-hover:scale-110">
             <Image
@@ -71,18 +76,18 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
           </div>
         </div>
 
-        {/* CONFIGURACIÓN - Respetando inputs y etiquetas originales */}
+        {/* CONFIGURACIÓN */}
         <div className="flex items-center gap-2 md:gap-4 border-l border-border-main pl-3 md:pl-8">
           <div className="flex gap-1 md:gap-3 items-center bg-card-bg/50 p-1 md:p-1.5 rounded-xl border border-border-main shadow-inner">
             {(['columns', 'rows', 'gap'] as const).map(k => (
               <div key={k} className="flex flex-col items-start gap-1 px-0.5 md:px-1">
                 <label className="text-[6px] md:text-[7px] font-black uppercase text-slate-500 tracking-[0.2em] leading-none ml-1">
-                  {t[k]} {(k === 'columns' || k === 'rows') && "(max 12)"}
+                  {t[k]}
                 </label>
                 <input
                   type="number"
                   min="1"
-                  max={k === 'gap' ? "100" : "12"}
+                  max="50"
                   value={config[k]}
                   onChange={e => handleConfigChange(k, e.target.value)}
                   className="w-10 md:w-14 bg-app-bg border border-border-main rounded-lg px-1 md:px-2 py-1 text-[10px] md:text-[11px] font-bold text-text-title focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all hover:bg-card-bg appearance-none text-center"
@@ -92,7 +97,6 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
 
             <div className="w-[1px] h-6 bg-border-main mx-1 hidden sm:block" />
 
-            {/* BOTÓN ERASER - Con efecto de rotación original */}
             <button
               onClick={resetInputs}
               className="flex flex-col items-center justify-center gap-1 px-2 md:px-3 py-1 rounded-lg hover:bg-app-bg text-slate-500 hover:text-blue-400 transition-all group"
@@ -119,7 +123,7 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
           <Moon size={18} className="block dark:hidden" />
         </button>
 
-        {/* IDIOMA - Con efecto circular original */}
+        {/* IDIOMA */}
         <button
           onClick={onToggleLang}
           className="group flex items-center gap-1.5 md:gap-2.5 px-2 md:px-3 py-1.5 rounded-full bg-card-bg border border-border-main hover:border-blue-500/50 hover:bg-app-bg transition-all"
@@ -132,7 +136,7 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
           </span>
         </button>
 
-        {/* AYUDA - Con el Tooltip animado que pediste mantener */}
+        {/* AYUDA */}
         <div className="relative flex items-center justify-center">
           {showTooltip && (
             <div className="absolute top-12 right-0 bg-blue-600 text-white text-[10px] font-black py-2.5 px-4 rounded-xl shadow-2xl whitespace-nowrap animate-bounce-subtle pointer-events-none z-[110] uppercase tracking-wider border border-white/10">
@@ -145,7 +149,7 @@ export const Navbar = ({ config, setConfig, onShowHelp, onReset, lang, onToggleL
           </button>
         </div>
 
-        {/* RESET - Botón rojo con rotación original */}
+        {/* RESET */}
         <button
           onClick={onReset}
           className="group flex items-center gap-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-2.5 md:px-4 py-2 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] transition-all border border-red-500/20 active:scale-95"
