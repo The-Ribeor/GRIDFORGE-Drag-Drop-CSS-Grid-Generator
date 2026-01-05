@@ -1,4 +1,5 @@
 export type Language = 'es' | 'en';
+export type ExportMode = 'css' | 'tailwind'; // Agregamos esto
 
 export interface GridConfig {
   columns: number;

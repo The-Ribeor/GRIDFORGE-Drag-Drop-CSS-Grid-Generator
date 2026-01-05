@@ -7,6 +7,7 @@ import { Plus } from 'lucide-react';
 import { Navbar } from '@/components/ui/Navbar';
 import { Footer } from '@/components/ui/Footer';
 import { HelpModal } from '@/components/ui/HelpModal';
+import { ExportModal } from '@/components/ui/ExportModal'; // Importamos el nuevo modal
 import { GridItem } from '@/components/grid/GridItem';
 import { useGridEditor } from '@/hook/useGridEditor';
 import { Language } from '@/lib/types';
@@ -15,6 +16,7 @@ import { SocialSidebar } from '@/components/ui/FloatingSocials';
 export default function FinalApp({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params) as { lang: Language };
   const [mounted, setMounted] = useState(false);
+  const [showExport, setShowExport] = useState(false); // Estado para el modal de Tailwind/CSS
   const router = useRouter();
   const pathname = usePathname();
 
@@ -44,7 +46,6 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
   const toggleLang = () => {
     const newLang = lang === 'es' ? 'en' : 'es';
     const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
-    // replace y scroll: false mantienen la posición y suavizan el cambio
     router.replace(newPath, { scroll: false });
   };
 
@@ -53,7 +54,15 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
 
   return (
     <div className="min-h-screen bg-app-bg text-text-body font-sans flex flex-col transition-none">
+      {/* Modales de Interfaz */}
       {showHelp && <HelpModal lang={lang} onClose={() => setShowHelp(false)} />}
+      
+      <ExportModal 
+        isOpen={showExport} 
+        onClose={() => setShowExport(false)} 
+        items={reindexedItems}
+        config={config}
+      />
 
       <Navbar
         lang={lang}
@@ -62,6 +71,7 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
         setConfig={setConfig}
         onShowHelp={() => setShowHelp(true)}
         onReset={resetItems}
+        onShowExport={() => setShowExport(true)} // Conexión con el botón de exportar
       />
 
       <main className="flex-1 p-8 overflow-auto">
