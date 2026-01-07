@@ -6,37 +6,46 @@ import { GridConfig, GridElement } from '@/lib/types';
 import { resolveDisplacement } from '@/lib/grid-utils';
 
 export function useGridEditor() {
-  const [config, setConfig] = useState<GridConfig>({ columns: 5, rows: 5, gap: 8 });
-  const [items, setItems] = useState<GridElement[]>([]);
+  // 1. Inicialización Lazy (Sin efectos de carga)
+  const [config, setConfig] = useState<GridConfig>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('gridforge_config_v2');
+      return saved ? JSON.parse(saved) : { columns: 5, rows: 5, gap: 8 };
+    }
+    return { columns: 5, rows: 5, gap: 8 };
+  });
+
+  const [items, setItems] = useState<GridElement[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('gridforge_items_v2');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
   const [activeDragItem, setActiveDragItem] = useState<GridElement | null>(null);
   const [dragPreview, setDragPreview] = useState<{ colStart: number, rowStart: number } | null>(null);
   const [showHelp, setShowHelp] = useState(false);
-  
-  const isHydrated = useRef(false);
   const originalItemsRef = useRef<GridElement[]>([]);
 
+  // 2. Persistencia (Solo para guardar)
   useEffect(() => {
-    const savedItems = localStorage.getItem('gridforge_items_v2');
-    const savedConfig = localStorage.getItem('gridforge_config_v2');
-    if (savedItems) {
-      try {
-        const parsed = JSON.parse(savedItems);
-        if (parsed && parsed.length > 0) setItems(parsed);
-      } catch (e) { console.error(e); }
-    }
-    if (savedConfig) {
-      try { setConfig(JSON.parse(savedConfig)); } catch (e) { console.error(e); }
-    }
-    const timer = setTimeout(() => { isHydrated.current = true; }, 50);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (isHydrated.current) {
-      localStorage.setItem('gridforge_items_v2', JSON.stringify(items));
-      localStorage.setItem('gridforge_config_v2', JSON.stringify(config));
-    }
+    localStorage.setItem('gridforge_items_v2', JSON.stringify(items));
+    localStorage.setItem('gridforge_config_v2', JSON.stringify(config));
   }, [items, config]);
+
+  /**
+   * 💡 SOLUCIÓN MAESTRA: Estado Derivado
+   * En lugar de un useEffect que "limpia" y causa errores de cascada,
+   * calculamos los items válidos en cada render. Es mucho más rápido y sin errores.
+   */
+  const validItems = items.filter(item => 
+    item.colStart <= config.columns && item.rowStart <= config.rows
+  ).map(item => ({
+    ...item,
+    colSpan: Math.min(item.colSpan, config.columns - item.colStart + 1),
+    rowSpan: Math.min(item.rowSpan, config.rows - item.rowStart + 1),
+  }));
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 3 } }), 
@@ -64,19 +73,19 @@ export function useGridEditor() {
 
     if (newColStart !== dragPreview?.colStart || newRowStart !== dragPreview?.rowStart) {
       setDragPreview({ colStart: newColStart, rowStart: newRowStart });
+      // Usamos validItems para la lógica de desplazamiento
       setItems(resolveDisplacement(originalItemsRef.current, { ...activeDragItem, colStart: newColStart, rowStart: newRowStart }, config));
     }
   };
 
   const handleDragEnd = () => {
-    // Al soltar, simplemente limpiamos. 
-    // El estado ya se actualizó en el último DragMove, así que el bloque ya está en su sitio.
     setActiveDragItem(null);
     setDragPreview(null);
     originalItemsRef.current = [];
   };
 
   const onResizeStart = useCallback(() => { originalItemsRef.current = [...items]; }, [items]);
+  
   const onResizeUpdate = useCallback((id: string, colSpan: number, rowSpan: number) => {
     const item = originalItemsRef.current.find(i => i.id === id);
     if (!item) return;
@@ -96,16 +105,18 @@ export function useGridEditor() {
   };
 
   const removeItem = (id: string) => setItems(prev => prev.filter(i => i.id !== id));
+
   const resetItems = () => {
-    isHydrated.current = false;
     setItems([]);
+    setConfig({ columns: 5, rows: 5, gap: 8 });
     localStorage.removeItem('gridforge_items_v2');
     localStorage.removeItem('gridforge_config_v2');
-    setTimeout(() => isHydrated.current = true, 50);
   };
 
   return {
-    config, setConfig, items, addItem, removeItem, resetItems,
+    config, setConfig, 
+    items: validItems, // 👈 Devolvemos validItems en lugar de items
+    addItem, removeItem, resetItems,
     activeDragItem, dragPreview, sensors, handleDragStart, handleDragMove, handleDragEnd,
     onResizeEnd, onResizeUpdate, onResizeStart,
     showHelp, setShowHelp

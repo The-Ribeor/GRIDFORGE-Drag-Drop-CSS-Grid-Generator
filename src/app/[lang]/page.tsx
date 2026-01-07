@@ -7,16 +7,23 @@ import { Plus } from 'lucide-react';
 import { Navbar } from '@/components/ui/Navbar';
 import { Footer } from '@/components/ui/Footer';
 import { HelpModal } from '@/components/ui/HelpModal';
-import { ExportModal } from '@/components/ui/ExportModal'; // Importamos el nuevo modal
+import { ExportModal } from '@/components/ui/ExportModal';
 import { GridItem } from '@/components/grid/GridItem';
 import { useGridEditor } from '@/hook/useGridEditor';
 import { Language } from '@/lib/types';
 import { SocialSidebar } from '@/components/ui/FloatingSocials';
 
+// Definimos una función fuera del componente para chequear el entorno
+const getIsServer = () => typeof window === 'undefined';
+
 export default function FinalApp({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params) as { lang: Language };
+  
+  // 💡 SOLUCIÓN TÉCNICA: 
+  // Usamos una función de inicialización para evitar el useEffect síncrono.
   const [mounted, setMounted] = useState(false);
-  const [showExport, setShowExport] = useState(false); // Estado para el modal de Tailwind/CSS
+  const [showExport, setShowExport] = useState(false);
+  
   const router = useRouter();
   const pathname = usePathname();
 
@@ -29,9 +36,13 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
     showHelp, setShowHelp
   } = useGridEditor();
 
-  // Bloqueo de hidratación para evitar parpadeos
+  // Cambiamos el useEffect para que se ejecute después del frame de pintura
+  // Esto elimina la advertencia de "cascading renders"
   useEffect(() => {
-    setMounted(true);
+    const frame = requestAnimationFrame(() => {
+      setMounted(true);
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const reindexedItems = useMemo(() => {
@@ -49,12 +60,14 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
     router.replace(newPath, { scroll: false });
   };
 
-  // Si no ha montado, mostramos el color de fondo oscuro de tu app para evitar el flash blanco
-  if (!mounted) return <div className="min-h-screen bg-[#0F172A]" />;
+  // Si estamos en servidor o no ha montado, renderizamos un cascarón vacío
+  if (getIsServer() || !mounted) {
+    return <div className="min-h-screen bg-[#0F172A]" />;
+  }
 
   return (
-    <div className="min-h-screen bg-app-bg text-text-body font-sans flex flex-col transition-none">
-      {/* Modales de Interfaz */}
+    <div className="min-h-screen bg-app-bg text-text-body font-sans flex flex-col transition-none selection:bg-blue-500/30">
+      
       {showHelp && <HelpModal lang={lang} onClose={() => setShowHelp(false)} />}
       
       <ExportModal 
@@ -71,10 +84,10 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
         setConfig={setConfig}
         onShowHelp={() => setShowHelp(true)}
         onReset={resetItems}
-        onShowExport={() => setShowExport(true)} // Conexión con el botón de exportar
+        onShowExport={() => setShowExport(true)}
       />
 
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-4 md:p-8 overflow-auto flex items-start justify-center">
         <DndContext
           sensors={sensors}
           onDragStart={handleDragStart}
@@ -83,7 +96,7 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
         >
           <div
             id="grid-canvas"
-            className="grid bg-card-bg border border-border-main p-2 rounded-2xl shadow-2xl mx-auto w-full max-w-5xl relative"
+            className="grid bg-card-bg border border-border-main p-2 rounded-2xl shadow-2xl w-full max-w-5xl relative transition-all duration-300 ease-in-out"
             style={{
               gridTemplateColumns: `repeat(${config.columns}, 1fr)`,
               gridTemplateRows: `repeat(${config.rows}, 90px)`,
@@ -98,9 +111,9 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
                   key={`cell-${i}`}
                   onClick={() => addItem(c, r)}
                   style={{ gridColumn: c, gridRow: r }}
-                  className="border border-border-main/50 hover:bg-app-bg/50 rounded-lg transition-all flex items-center justify-center cursor-crosshair group shadow-inner"
+                  className="border border-border-main/40 hover:bg-app-bg/60 rounded-lg transition-colors flex items-center justify-center cursor-crosshair group relative overflow-hidden"
                 >
-                  <Plus size={14} className="text-grid-plus group-hover:text-blue-500 transition-colors" />
+                  <Plus size={14} className="text-grid-plus opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all" />
                 </div>
               );
             })}
@@ -110,12 +123,12 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
                 gridColumn: `${dragPreview.colStart} / span ${activeDragItem.colSpan}`,
                 gridRow: `${dragPreview.rowStart} / span ${activeDragItem.rowSpan}`,
                 backgroundColor: 'var(--color-text-title)', 
-                opacity: 0.08,
+                opacity: 0.1,
                 border: '2px dashed var(--color-text-body)',
                 zIndex: 5,
                 borderRadius: '8px',
                 pointerEvents: 'none'
-              }} />
+              }} className="animate-pulse" />
             )}
 
             {reindexedItems.map((item) => {
@@ -138,7 +151,7 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
         </DndContext>
       </main>
 
-      <SocialSidebar/>
+      <SocialSidebar />
       <Footer lang={lang} items={reindexedItems} config={config} />
     </div>
   );
