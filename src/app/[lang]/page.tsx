@@ -19,8 +19,6 @@ const getIsServer = () => typeof window === 'undefined';
 export default function FinalApp({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params) as { lang: Language };
   
-  // 💡 SOLUCIÓN TÉCNICA: 
-  // Usamos una función de inicialización para evitar el useEffect síncrono.
   const [mounted, setMounted] = useState(false);
   const [showExport, setShowExport] = useState(false);
   
@@ -36,8 +34,6 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
     showHelp, setShowHelp
   } = useGridEditor();
 
-  // Cambiamos el useEffect para que se ejecute después del frame de pintura
-  // Esto elimina la advertencia de "cascading renders"
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       setMounted(true);
@@ -60,7 +56,6 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
     router.replace(newPath, { scroll: false });
   };
 
-  // Si estamos en servidor o no ha montado, renderizamos un cascarón vacío
   if (getIsServer() || !mounted) {
     return <div className="min-h-screen bg-[#0F172A]" />;
   }
@@ -103,6 +98,7 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
               gap: `${config.gap}px`
             }}
           >
+            {/* Celdas de fondo con las cruces (+) restauradas */}
             {Array.from({ length: config.columns * config.rows }).map((_, i) => {
               const c = (i % config.columns) + 1;
               const r = Math.floor(i / config.columns) + 1;
@@ -111,9 +107,12 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
                   key={`cell-${i}`}
                   onClick={() => addItem(c, r)}
                   style={{ gridColumn: c, gridRow: r }}
-                  className="border border-border-main/40 hover:bg-app-bg/60 rounded-lg transition-colors flex items-center justify-center cursor-crosshair group relative overflow-hidden"
+                  className="border border-border-main/40 rounded-lg transition-all flex items-center justify-center cursor-crosshair group relative overflow-hidden hover:bg-app-bg/60 hover:border-blue-500/30"
                 >
-                  <Plus size={14} className="text-grid-plus opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+                  <Plus 
+                    size={14} 
+                    className="text-slate-500 opacity-20 group-hover:opacity-100 group-hover:text-blue-500 group-hover:scale-110 transition-all" 
+                  />
                 </div>
               );
             })}
