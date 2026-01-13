@@ -1,157 +1,137 @@
 'use client';
 
-import { use, useMemo, useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { DndContext } from '@dnd-kit/core';
-import { Plus } from 'lucide-react';
-import { Navbar } from '@/components/ui/Navbar';
-import { Footer } from '@/components/ui/Footer';
-import { HelpModal } from '@/components/ui/HelpModal';
-import { ExportModal } from '@/components/ui/ExportModal';
-import { GridItem } from '@/components/grid/GridItem';
-import { useGridEditor } from '@/hook/useGridEditor';
+import { use, useEffect, useState } from 'react';
+import Navbar from '@/components/landing/Navbar';
+import Hero from '@/components/landing/Hero';
+import Process from '@/components/landing/Process';
+import Pricing from '@/components/landing/Pricing';
+import CollaborationForm from '@/components/landing/CollaborationForm';
+import Footer from '@/components/landing/Footer';
+import DynamicBackground from '@/components/landing/DynamicBackground';
 import { Language } from '@/lib/types';
-import { SocialSidebar } from '@/components/ui/FloatingSocials';
 
-// Definimos una función fuera del componente para chequear el entorno
-const getIsServer = () => typeof window === 'undefined';
+export default function LandingPage({ params }: { params: Promise<{ lang: string }> }) {
+    const { lang } = use(params) as { lang: Language };
+    const [scrolled, setScrolled] = useState(false);
 
-export default function FinalApp({ params }: { params: Promise<{ lang: string }> }) {
-  const { lang } = use(params) as { lang: Language };
-  
-  const [mounted, setMounted] = useState(false);
-  const [showExport, setShowExport] = useState(false);
-  
-  const router = useRouter();
-  const pathname = usePathname();
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 50);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
-  const {
-    config, setConfig,
-    items, addItem, removeItem, resetItems,
-    activeDragItem, dragPreview,
-    sensors, handleDragStart, handleDragMove, handleDragEnd,
-    onResizeEnd, onResizeUpdate, onResizeStart,
-    showHelp, setShowHelp
-  } = useGridEditor();
+    const scrollTo = (id: string) => {
+        const element = document.getElementById(id);
+        element?.scrollIntoView({ behavior: 'smooth' });
+    };
 
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      setMounted(true);
-    });
-    return () => cancelAnimationFrame(frame);
-  }, []);
+    return (
+        <div className="min-h-screen text-[#1A1A1A] font-sans selection:bg-[#FFD600] scroll-smooth overflow-x-hidden relative">
+            
+            {/* 1. FONDO DE ESFERAS Y BUSES DE DATOS */}
+            <DynamicBackground />
 
-  const reindexedItems = useMemo(() => {
-    return [...items]
-      .sort((a, b) => a.rowStart - b.rowStart || a.colStart - b.colStart)
-      .map((item, index) => ({
-        ...item,
-        number: index + 1
-      }));
-  }, [items]);
+            {/* Contenedor relativo para que el contenido flote sobre el fondo */}
+            <div className="relative z-10">
+                <Navbar scrolled={scrolled} scrollTo={scrollTo} lang={lang} />
+                
+                <main>
+                    {/* Hero con entrada suave */}
+                    <div className="animate-reveal">
+                        <Hero scrollTo={scrollTo} />
+                    </div>
+                    
+                    <Process />
+                    
+                    <Pricing />
+                    
+                    <CollaborationForm />
+                </main>
 
-  const toggleLang = () => {
-    const newLang = lang === 'es' ? 'en' : 'es';
-    const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
-    router.replace(newPath, { scroll: false });
-  };
+                <Footer scrollTo={scrollTo} />
+            </div>
 
-  if (getIsServer() || !mounted) {
-    return <div className="min-h-screen bg-[#0F172A]" />;
-  }
+            {/* Estilos Globales de Animación */}
+            <style jsx global>{`
+                /* Latido Orgánico del Corazón */
+                @keyframes heartbeat {
+                  0%, 100% { transform: scale(1); }
+                  15% { transform: scale(1.25); }
+                  30% { transform: scale(1); }
+                  45% { transform: scale(1.15); }
+                }
+                .animate-heartbeat { 
+                    animation: heartbeat 1.5s ease-in-out infinite; 
+                }
 
-  return (
-    <div className="min-h-screen bg-app-bg text-text-body font-sans flex flex-col transition-none selection:bg-blue-500/30">
-      
-      {showHelp && <HelpModal lang={lang} onClose={() => setShowHelp(false)} />}
-      
-      <ExportModal 
-        isOpen={showExport} 
-        onClose={() => setShowExport(false)} 
-        items={reindexedItems}
-        config={config}
-      />
+                /* Entrada suave de elementos */
+                @keyframes reveal {
+                  from { opacity: 0; transform: translateY(20px); }
+                  to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-reveal {
+                    animation: reveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                }
 
-      <Navbar
-        lang={lang}
-        onToggleLang={toggleLang}
-        config={config}
-        setConfig={setConfig}
-        onShowHelp={() => setShowHelp(true)}
-        onReset={resetItems}
-        onShowExport={() => setShowExport(true)}
-      />
+                /* Movimiento de Esferas (Blobs) */
+                @keyframes blob {
+                  0% { transform: translate(0px, 0px) scale(1); }
+                  33% { transform: translate(30px, -50px) scale(1.1); }
+                  66% { transform: translate(-20px, 20px) scale(0.9); }
+                  100% { transform: translate(0px, 0px) scale(1); }
+                }
+                .animate-blob {
+                  animation: blob 10s infinite alternate ease-in-out;
+                }
 
-      <main className="flex-1 p-4 md:p-8 overflow-auto flex items-start justify-center">
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragMove={handleDragMove}
-          onDragEnd={handleDragEnd}
-        >
-          <div
-            id="grid-canvas"
-            className="grid bg-card-bg border border-border-main p-2 rounded-2xl shadow-2xl w-full max-w-5xl relative transition-all duration-300 ease-in-out"
-            style={{
-              gridTemplateColumns: `repeat(${config.columns}, 1fr)`,
-              gridTemplateRows: `repeat(${config.rows}, 90px)`,
-              gap: `${config.gap}px`
-            }}
-          >
-            {/* Celdas de fondo con las cruces (+) restauradas */}
-            {Array.from({ length: config.columns * config.rows }).map((_, i) => {
-              const c = (i % config.columns) + 1;
-              const r = Math.floor(i / config.columns) + 1;
-              return (
-                <div
-                  key={`cell-${i}`}
-                  onClick={() => addItem(c, r)}
-                  style={{ gridColumn: c, gridRow: r }}
-                  className="border border-border-main/40 rounded-lg transition-all flex items-center justify-center cursor-crosshair group relative overflow-hidden hover:bg-app-bg/60 hover:border-blue-500/30"
-                >
-                  <Plus 
-                    size={14} 
-                    className="text-slate-500 opacity-20 group-hover:opacity-100 group-hover:text-blue-500 group-hover:scale-110 transition-all" 
-                  />
-                </div>
-              );
-            })}
+                /* Flujo de Datos (Buses) */
+                @keyframes data-flow {
+                  0% { transform: translateY(-100%); opacity: 0; }
+                  50% { opacity: 0.5; }
+                  100% { transform: translateY(100%); opacity: 0; }
+                }
+                .animate-data-flow {
+                  animation: data-flow 6s linear infinite;
+                }
 
-            {activeDragItem && dragPreview && (
-              <div style={{
-                gridColumn: `${dragPreview.colStart} / span ${activeDragItem.colSpan}`,
-                gridRow: `${dragPreview.rowStart} / span ${activeDragItem.rowSpan}`,
-                backgroundColor: 'var(--color-text-title)', 
-                opacity: 0.1,
-                border: '2px dashed var(--color-text-body)',
-                zIndex: 5,
-                borderRadius: '8px',
-                pointerEvents: 'none'
-              }} className="animate-pulse" />
-            )}
+                /* Cinta Corrediza (Marquee) */
+                @keyframes marquee {
+                  0% { transform: translateX(0%); }
+                  100% { transform: translateX(-50%); }
+                }
+                .animate-marquee {
+                  animation: marquee 25s linear infinite;
+                }
 
-            {reindexedItems.map((item) => {
-              const isDraggingThis = activeDragItem?.id === item.id;
-              const displayItem = isDraggingThis ? { ...activeDragItem, number: item.number } : item;
-
-              return (
-                <GridItem
-                  key={item.id}
-                  item={displayItem}
-                  config={config}
-                  onRemove={removeItem}
-                  onResizeStart={onResizeStart}
-                  onResizeUpdate={onResizeUpdate}
-                  onResizeEnd={onResizeEnd}
-                />
-              );
-            })}
-          </div>
-        </DndContext>
-      </main>
-
-      <SocialSidebar />
-      <Footer lang={lang} items={reindexedItems} config={config} />
-    </div>
-  );
+                /* Utilidades de Navegación */
+                .nav-link-item { 
+                    font-weight: 900; 
+                    text-transform: uppercase; 
+                    letter-spacing: 0.1em; 
+                    opacity: 0.6; 
+                    transition: 0.2s; 
+                }
+                .nav-link-item:hover { 
+                    opacity: 1; 
+                    transform: translateY(-1px); 
+                }
+                .footer-link { 
+                    font-size: 10px; 
+                    font-weight: 900; 
+                    text-transform: uppercase; 
+                    text-align: left; 
+                    opacity: 0.5; 
+                    transition: 0.2s; 
+                    width: fit-content; 
+                }
+                .footer-link:hover { 
+                    opacity: 1; 
+                    color: #FFD600; 
+                }
+                @media (max-width: 768px) { 
+                    .footer-link { text-align: center; width: 100%; } 
+                }
+            `}</style>
+        </div>
+    );
 }
