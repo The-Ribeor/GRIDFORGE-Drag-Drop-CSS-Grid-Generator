@@ -132,6 +132,7 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
               const isDraggingThis = activeDragItem?.id === item.id;
               const displayItem = isDraggingThis ? { ...activeDragItem, number: item.number } : item;
 
+              
               return (
                 <GridItem
                   key={item.id}
