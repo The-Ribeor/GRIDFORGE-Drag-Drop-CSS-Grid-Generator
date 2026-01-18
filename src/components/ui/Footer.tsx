@@ -148,7 +148,7 @@ export const Footer = ({ items, config, lang }: { items: GridElement[], config: 
                   <span>{t.crafted}</span>
                   <Heart size={10} className="text-red-500 fill-red-500 animate-pulse" />
                   <span>{t.by}</span>
-                  <a href="https://www.theribeor.com" target="_blank" rel="noopener noreferrer" className="text-text-title hover:text-blue-500 underline decoration-border-main underline-offset-4 transition-colors">The Ribeor</a>
+                  <a href="https://www.linkedin.com/in/diegoberrio1601/" target="_blank" rel="noopener noreferrer" className="text-text-title hover:text-blue-500 underline decoration-border-main underline-offset-4 transition-colors">@DiegoBerrio1601</a>
                   <span className="hidden xs:inline">© {new Date().getFullYear()}</span>
                 </div>
               </div>
