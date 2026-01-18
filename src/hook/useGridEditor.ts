@@ -5,8 +5,20 @@ import { DragStartEvent, DragMoveEvent, DragEndEvent, MouseSensor, TouchSensor, 
 import { GridConfig, GridElement } from '@/lib/types';
 import { resolveDisplacement } from '@/lib/grid-utils';
 
+/**
+ * Función de utilidad para generar IDs únicos
+ * Funciona en móviles y entornos no seguros (sin HTTPS)
+ */
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback para navegadores antiguos o contextos no seguros
+  return Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+};
+
 export function useGridEditor() {
-  // 1. Inicialización Lazy (Sin efectos de carga)
+  // 1. Inicialización Lazy
   const [config, setConfig] = useState<GridConfig>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('gridforge_config_v2');
@@ -28,17 +40,12 @@ export function useGridEditor() {
   const [showHelp, setShowHelp] = useState(false);
   const originalItemsRef = useRef<GridElement[]>([]);
 
-  // 2. Persistencia (Solo para guardar)
+  // 2. Persistencia
   useEffect(() => {
     localStorage.setItem('gridforge_items_v2', JSON.stringify(items));
     localStorage.setItem('gridforge_config_v2', JSON.stringify(config));
   }, [items, config]);
 
-  /**
-   * 💡 SOLUCIÓN MAESTRA: Estado Derivado
-   * En lugar de un useEffect que "limpia" y causa errores de cascada,
-   * calculamos los items válidos en cada render. Es mucho más rápido y sin errores.
-   */
   const validItems = items.filter(item => 
     item.colStart <= config.columns && item.rowStart <= config.rows
   ).map(item => ({
@@ -73,7 +80,6 @@ export function useGridEditor() {
 
     if (newColStart !== dragPreview?.colStart || newRowStart !== dragPreview?.rowStart) {
       setDragPreview({ colStart: newColStart, rowStart: newRowStart });
-      // Usamos validItems para la lógica de desplazamiento
       setItems(resolveDisplacement(originalItemsRef.current, { ...activeDragItem, colStart: newColStart, rowStart: newRowStart }, config));
     }
   };
@@ -100,7 +106,15 @@ export function useGridEditor() {
   const addItem = (c: number, r: number) => {
     const nextNum = items.length > 0 ? Math.max(...items.map(it => it.number)) + 1 : 1;
     if (!items.find(it => it.colStart === c && it.rowStart === r)) {
-      setItems(prev => [...prev, { id: crypto.randomUUID(), number: nextNum, colStart: c, colSpan: 1, rowStart: r, rowSpan: 1, color: '#fff' }]);
+      setItems(prev => [...prev, { 
+        id: generateId(), // 👈 Cambio clave aquí
+        number: nextNum, 
+        colStart: c, 
+        colSpan: 1, 
+        rowStart: r, 
+        rowSpan: 1, 
+        color: '#fff' 
+      }]);
     }
   };
 
@@ -115,7 +129,7 @@ export function useGridEditor() {
 
   return {
     config, setConfig, 
-    items: validItems, // 👈 Devolvemos validItems en lugar de items
+    items: validItems,
     addItem, removeItem, resetItems,
     activeDragItem, dragPreview, sensors, handleDragStart, handleDragMove, handleDragEnd,
     onResizeEnd, onResizeUpdate, onResizeStart,
