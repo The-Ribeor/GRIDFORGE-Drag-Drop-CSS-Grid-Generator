@@ -158,7 +158,7 @@ export const Footer = ({ items, config, lang }: { items: GridElement[], config: 
           <div className="flex gap-6 text-text-body pb-2 md:pb-0">
             <a href="https://github.com/Diegoberrio1601" target="_blank" rel="noopener noreferrer" className="hover:text-text-title transition-all transform hover:-translate-y-1"><Github size={20} /></a>
             <a href="https://www.linkedin.com/in/diegoberrio1601/" target="_blank" rel="noopener noreferrer" className="hover:text-text-title transition-all transform hover:-translate-y-1"><Linkedin size={20} /></a>
-            <a href="https://www.instagram.com/theribeor/" target="_blank" rel="noopener noreferrer" className="hover:text-text-title transition-all transform hover:-translate-y-1"><Instagram size={20} /></a>
+            <a href="https://www.instagram.com/diegoberrio1601/" target="_blank" rel="noopener noreferrer" className="hover:text-text-title transition-all transform hover:-translate-y-1"><Instagram size={20} /></a>
           </div>
         </div>
       </div>
