@@ -1,161 +1,3 @@
-// 'use client';
-
-// import { use, useMemo, useState, useEffect } from 'react';
-// import { useRouter, usePathname } from 'next/navigation';
-// import { DndContext } from '@dnd-kit/core';
-// import { Plus } from 'lucide-react';
-// import { Navbar } from '@/components/ui/Navbar';
-// import { Footer } from '@/components/ui/Footer';
-// import { HelpModal } from '@/components/ui/HelpModal';
-// import { ExportModal } from '@/components/ui/ExportModal';
-// import { GridItem } from '@/components/grid/GridItem';
-// import { useGridEditor } from '@/hook/useGridEditor';
-// import { Language } from '@/lib/types';
-// import { SocialSidebar } from '@/components/ui/FloatingSocials';
-
-// // Definimos una función fuera del componente para chequear el entorno
-// const getIsServer = () => typeof window === 'undefined';
-
-// export default function FinalApp({ params }: { params: Promise<{ lang: string }> }) {
-//   const { lang } = use(params) as { lang: Language };
-  
-//   const [mounted, setMounted] = useState(false);
-//   const [showExport, setShowExport] = useState(false);
-  
-//   const router = useRouter();
-//   const pathname = usePathname();
-
-//   const {
-//     config, setConfig,
-//     items, addItem, removeItem, resetItems,
-//     activeDragItem, dragPreview,
-//     sensors, handleDragStart, handleDragMove, handleDragEnd,
-//     onResizeEnd, onResizeUpdate, onResizeStart,
-//     showHelp, setShowHelp
-//   } = useGridEditor();
-
-//   useEffect(() => {
-//     const frame = requestAnimationFrame(() => {
-//       setMounted(true);
-//     });
-//     return () => cancelAnimationFrame(frame);
-//   }, []);
-
-//   const reindexedItems = useMemo(() => {
-//     return [...items]
-//       .sort((a, b) => a.rowStart - b.rowStart || a.colStart - b.colStart)
-//       .map((item, index) => ({
-//         ...item,
-//         number: index + 1
-//       }));
-//   }, [items]);
-
-//   const toggleLang = () => {
-//     const newLang = lang === 'es' ? 'en' : 'es';
-//     const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
-//     router.replace(newPath, { scroll: false });
-//   };
-
-//   if (getIsServer() || !mounted) {
-//     return <div className="min-h-screen bg-[#0F172A]" />;
-//   }
-
-//   return (
-//     <div className="min-h-screen bg-app-bg text-text-body font-sans flex flex-col transition-none selection:bg-blue-500/30">
-      
-//       {showHelp && <HelpModal lang={lang} onClose={() => setShowHelp(false)} />}
-      
-//       <ExportModal 
-//         isOpen={showExport} 
-//         onClose={() => setShowExport(false)} 
-//         items={reindexedItems}
-//         config={config}
-//       />
-
-//       <Navbar
-//         lang={lang}
-//         onToggleLang={toggleLang}
-//         config={config}
-//         setConfig={setConfig}
-//         onShowHelp={() => setShowHelp(true)}
-//         onReset={resetItems}
-//         onShowExport={() => setShowExport(true)}
-//       />
-
-//       <main className="flex-1 p-4 md:p-8 overflow-auto flex items-start justify-center">
-//         <DndContext
-//           sensors={sensors}
-//           onDragStart={handleDragStart}
-//           onDragMove={handleDragMove}
-//           onDragEnd={handleDragEnd}
-//         >
-//           <div
-//             id="grid-canvas"
-//             className="grid bg-card-bg border border-border-main p-2 rounded-2xl shadow-2xl w-full max-w-5xl relative transition-all duration-300 ease-in-out"
-//             style={{
-//               gridTemplateColumns: `repeat(${config.columns}, 1fr)`,
-//               gridTemplateRows: `repeat(${config.rows}, 90px)`,
-//               gap: `${config.gap}px`
-//             }}
-//           >
-//             {/* Celdas de fondo con las cruces (+) restauradas */}
-//             {Array.from({ length: config.columns * config.rows }).map((_, i) => {
-//               const c = (i % config.columns) + 1;
-//               const r = Math.floor(i / config.columns) + 1;
-//               return (
-//                 <div
-//                   key={`cell-${i}`}
-//                   onClick={() => addItem(c, r)}
-//                   style={{ gridColumn: c, gridRow: r }}
-//                   className="border border-border-main/40 rounded-lg transition-all flex items-center justify-center cursor-crosshair group relative overflow-hidden hover:bg-app-bg/60 hover:border-blue-500/30"
-//                 >
-//                   <Plus 
-//                     size={14} 
-//                     className="text-slate-500 opacity-20 group-hover:opacity-100 group-hover:text-blue-500 group-hover:scale-110 transition-all" 
-//                   />
-//                 </div>
-//               );
-//             })}
-
-//             {activeDragItem && dragPreview && (
-//               <div style={{
-//                 gridColumn: `${dragPreview.colStart} / span ${activeDragItem.colSpan}`,
-//                 gridRow: `${dragPreview.rowStart} / span ${activeDragItem.rowSpan}`,
-//                 backgroundColor: 'var(--color-text-title)', 
-//                 opacity: 0.1,
-//                 border: '2px dashed var(--color-text-body)',
-//                 zIndex: 5,
-//                 borderRadius: '8px',
-//                 pointerEvents: 'none'
-//               }} className="animate-pulse" />
-//             )}
-
-//             {reindexedItems.map((item) => {
-//               const isDraggingThis = activeDragItem?.id === item.id;
-//               const displayItem = isDraggingThis ? { ...activeDragItem, number: item.number } : item;
-
-//               return (
-//                 <GridItem
-//                   key={item.id}
-//                   item={displayItem}
-//                   config={config}
-//                   onRemove={removeItem}
-//                   onResizeStart={onResizeStart}
-//                   onResizeUpdate={onResizeUpdate}
-//                   onResizeEnd={onResizeEnd}
-//                 />
-//               );
-//             })}
-//           </div>
-//         </DndContext>
-//       </main>
-
-//       <SocialSidebar />
-//       <Footer lang={lang} items={reindexedItems} config={config} />
-//     </div>
-//   );
-// }
-
 'use client';
 
 import { use, useMemo, useState, useEffect } from 'react';
@@ -166,7 +8,7 @@ import { Navbar } from '@/components/ui/Navbar';
 import { Footer } from '@/components/ui/Footer';
 import { HelpModal } from '@/components/ui/HelpModal';
 import { ExportModal } from '@/components/ui/ExportModal';
-import { IAApprovalModal } from '@/components/ui/IAApprovalModal'; // 1. Importar el nuevo modal
+import { IAApprovalModal } from '@/components/ui/IAApprovalModal';
 import { GridItem } from '@/components/grid/GridItem';
 import { useGridEditor } from '@/hook/useGridEditor';
 import { Language } from '@/lib/types';
@@ -175,11 +17,13 @@ import { SocialSidebar } from '@/components/ui/FloatingSocials';
 const getIsServer = () => typeof window === 'undefined';
 
 export default function FinalApp({ params }: { params: Promise<{ lang: string }> }) {
-  const { lang } = use(params) as { lang: Language };
+  // Desenvolvemos los params siguiendo la normativa de Next.js
+  const resolvedParams = use(params);
+  const lang = resolvedParams.lang as Language;
   
   const [mounted, setMounted] = useState(false);
   const [showExport, setShowExport] = useState(false);
-  const [showIAModal, setShowIAModal] = useState(false); // 2. Estado para el modal de IA
+  const [showIAModal, setShowIAModal] = useState(false); 
   
   const router = useRouter();
   const pathname = usePathname();
@@ -187,20 +31,27 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
   const {
     config, setConfig,
     items, addItem, removeItem, resetItems,
-    activeDragItem, dragPreview,
     sensors, handleDragStart, handleDragMove, handleDragEnd,
     onResizeEnd, onResizeUpdate, onResizeStart,
     showHelp, setShowHelp
   } = useGridEditor();
 
   useEffect(() => {
+    // Evitamos el renderizado en cascada síncrono usando requestAnimationFrame
+    // Esto asegura que el estado cambie DESPUÉS de que el navegador haya pintado
     const frame = requestAnimationFrame(() => {
       setMounted(true);
-      // 3. Activar el modal automáticamente al cargar
-      // Opcional: podrías usar un setTimeout de 1000ms para que no sea tan abrupto
-      setShowIAModal(true); 
     });
-    return () => cancelAnimationFrame(frame);
+
+    // Retraso para el modal de IA: 2 segundos después del montaje
+    const timer = setTimeout(() => {
+      setShowIAModal(true);
+    }, 2000);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
   }, []);
 
   const reindexedItems = useMemo(() => {
@@ -218,6 +69,7 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
     router.replace(newPath, { scroll: false });
   };
 
+  // Pre-renderizado de seguridad para SSR
   if (getIsServer() || !mounted) {
     return <div className="min-h-screen bg-[#0F172A]" />;
   }
@@ -225,8 +77,8 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
   return (
     <div className="min-h-screen bg-app-bg text-text-body font-sans flex flex-col transition-none selection:bg-blue-500/30">
       
-      {/* 4. Renderizado condicional del modal */}
-      {showIAModal && <IAApprovalModal onClose={() => setShowIAModal(false)} />}
+      {/* Modales con prioridad de Z-Index */}
+      {showIAModal && <IAApprovalModal lang={lang} onClose={() => setShowIAModal(false)} />}
       
       {showHelp && <HelpModal lang={lang} onClose={() => setShowHelp(false)} />}
       
@@ -263,7 +115,6 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
               gap: `${config.gap}px`
             }}
           >
-            {/* ... resto de tu código de celdas y items ... */}
             {Array.from({ length: config.columns * config.rows }).map((_, i) => {
               const c = (i % config.columns) + 1;
               const r = Math.floor(i / config.columns) + 1;
@@ -282,22 +133,17 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
               );
             })}
 
-            {reindexedItems.map((item) => {
-              const isDraggingThis = activeDragItem?.id === item.id;
-              const displayItem = isDraggingThis ? { ...activeDragItem, number: item.number } : item;
-
-              return (
-                <GridItem
-                  key={item.id}
-                  item={displayItem}
-                  config={config}
-                  onRemove={removeItem}
-                  onResizeStart={onResizeStart}
-                  onResizeUpdate={onResizeUpdate}
-                  onResizeEnd={onResizeEnd}
-                />
-              );
-            })}
+            {reindexedItems.map((item) => (
+              <GridItem
+                key={item.id}
+                item={item}
+                config={config}
+                onRemove={removeItem}
+                onResizeStart={onResizeStart}
+                onResizeUpdate={onResizeUpdate}
+                onResizeEnd={onResizeEnd}
+              />
+            ))}
           </div>
         </DndContext>
       </main>

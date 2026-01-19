@@ -2,8 +2,7 @@ export const translations = {
   es: {
     seo: {
       title: "GRIDFORGE | Generador de CSS Grid Interactivo",
-      description:
-        "La herramienta definitiva para forjar layouts de CSS Grid visualmente. Arrastra, redimensiona y genera código HTML/CSS limpio.",
+      description: "La herramienta definitiva para forjar layouts de CSS Grid visualmente. Arrastra, redimensiona y genera código HTML/CSS limpio.",
     },
     nav: {
       columns: "columnas",
@@ -26,6 +25,30 @@ export const translations = {
       author: "Por",
       button: "¡A forjar!",
     },
+    waiting: {
+      tag: "Próxima Evolución",
+      titlePart1: "De Móvil a",
+      titlePart2: "Todo el Mundo",
+      desc: "Estamos forjando una IA que escala tus diseños mobile-first a Tablets y Desktop al instante.",
+      join: "¿Te unes al despliegue?",
+      roleWait: "Esperar",
+      roleDev: "Desarrollar",
+      emailLabel: "Email de contacto",
+      feedbackDev: "Stack / Tecnologías",
+      feedbackWait: "¿Sugerencias o ideas?",
+      placeholderDev: "React, Next.js, IA...",
+      placeholderWait: "Cuéntanos qué te gustaría ver...",
+      submitDev: "Enviar Perfil Dev",
+      submitWait: "Unirme a la Lista",
+      syncing: "Sincronizando...",
+      footerNote: "Respetamos tu bandeja de entrada. Solo recibirás el registro de progreso.",
+      statusLabel: "Estado del Sistema:",
+      successDevTitle: "NODO VINCULADO",
+      successWaitTitle: "ACCESO GARANTIZADO",
+      successDevMsg: "Hemos recibido tus credenciales técnicas. Nuestro equipo revisará tu stack para integrarte al despliegue del motor de IA en la fase beta.",
+      successWaitMsg: "Te has unido a la vanguardia. Tu lugar en la lista de espera está asegurado. Te notificaremos cuando la IA esté lista para transformar tus grids.",
+      closeTerminal: "Cerrar Terminal",
+    },
     footer: {
       html: "Generado",
       css: "Generado",
@@ -43,8 +66,7 @@ export const translations = {
   en: {
     seo: {
       title: "GRIDFORGE | Interactive CSS Grid Generator",
-      description:
-        "The ultimate tool to forge CSS Grid layouts visually. Drag, resize, and generate clean HTML/CSS code instantly.",
+      description: "The ultimate tool to forge CSS Grid layouts visually. Drag, resize, and generate clean HTML/CSS code instantly.",
     },
     nav: {
       columns: "columns",
@@ -66,6 +88,30 @@ export const translations = {
       step7: "Switch between light and dark mode to forge with your preferred style.",
       author: "By",
       button: "Start forging!",
+    },
+    waiting: {
+      tag: "Next Evolution",
+      titlePart1: "From Mobile to",
+      titlePart2: "The World",
+      desc: "We are forging an AI that scales your mobile-first designs to Tablets and Desktop instantly.",
+      join: "Join the deployment?",
+      roleWait: "Wait",
+      roleDev: "Develop",
+      emailLabel: "Contact Email",
+      feedbackDev: "Stack / Technologies",
+      feedbackWait: "Suggestions or ideas?",
+      placeholderDev: "React, Next.js, AI...",
+      placeholderWait: "Tell us what you'd like to see...",
+      submitDev: "Send Dev Profile",
+      submitWait: "Join the List",
+      syncing: "Syncing...",
+      footerNote: "We respect your inbox. You will only receive progress logs.",
+      statusLabel: "System Status:",
+      successDevTitle: "NODE LINKED",
+      successWaitTitle: "ACCESS GUARANTEED",
+      successDevMsg: "We have received your technical credentials. Our team will review your stack to integrate you into the AI engine deployment beta phase.",
+      successWaitMsg: "You have joined the vanguard. Your place on the waitlist is secured. We will notify you when the AI is ready to transform your grids.",
+      closeTerminal: "Close Terminal",
     },
     footer: {
       html: "SOURCE",
