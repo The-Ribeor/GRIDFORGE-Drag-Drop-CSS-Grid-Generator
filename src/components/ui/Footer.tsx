@@ -57,10 +57,31 @@ export const Footer = ({ items, config, lang }: { items: GridElement[], config: 
     return `<div class="${container}">\n${children}\n</div>`;
   }, [items, config]);
 
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    setCopyStatus(label);
-    setTimeout(() => setCopyStatus(null), 2000);
+  // --- FUNCIÓN DE COPIADO CORREGIDA (CON FALLBACK PARA MÓVIL) ---
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      // Intento con la API moderna primero
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback para navegadores antiguos o contextos no seguros (HTTP)
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      
+      setCopyStatus(label);
+      setTimeout(() => setCopyStatus(null), 2000);
+    } catch (err) {
+      console.error('Fallo al copiar: ', err);
+    }
   };
 
   return (

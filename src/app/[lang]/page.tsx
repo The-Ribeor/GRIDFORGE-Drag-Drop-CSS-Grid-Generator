@@ -17,7 +17,6 @@ import { SocialSidebar } from '@/components/ui/FloatingSocials';
 const getIsServer = () => typeof window === 'undefined';
 
 export default function FinalApp({ params }: { params: Promise<{ lang: string }> }) {
-  // Desenvolvemos los params siguiendo la normativa de Next.js
   const resolvedParams = use(params);
   const lang = resolvedParams.lang as Language;
   
@@ -31,19 +30,17 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
   const {
     config, setConfig,
     items, addItem, removeItem, resetItems,
+    activeDragItem, dragPreview, // RESTAURADO: Necesarios para la lógica visual
     sensors, handleDragStart, handleDragMove, handleDragEnd,
     onResizeEnd, onResizeUpdate, onResizeStart,
     showHelp, setShowHelp
   } = useGridEditor();
 
   useEffect(() => {
-    // Evitamos el renderizado en cascada síncrono usando requestAnimationFrame
-    // Esto asegura que el estado cambie DESPUÉS de que el navegador haya pintado
     const frame = requestAnimationFrame(() => {
       setMounted(true);
     });
 
-    // Retraso para el modal de IA: 2 segundos después del montaje
     const timer = setTimeout(() => {
       setShowIAModal(true);
     }, 2000);
@@ -69,7 +66,6 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
     router.replace(newPath, { scroll: false });
   };
 
-  // Pre-renderizado de seguridad para SSR
   if (getIsServer() || !mounted) {
     return <div className="min-h-screen bg-[#0F172A]" />;
   }
@@ -77,9 +73,7 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
   return (
     <div className="min-h-screen bg-app-bg text-text-body font-sans flex flex-col transition-none selection:bg-blue-500/30">
       
-      {/* Modales con prioridad de Z-Index */}
       {showIAModal && <IAApprovalModal lang={lang} onClose={() => setShowIAModal(false)} />}
-      
       {showHelp && <HelpModal lang={lang} onClose={() => setShowHelp(false)} />}
       
       <ExportModal 
@@ -115,6 +109,7 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
               gap: `${config.gap}px`
             }}
           >
+            {/* Celdas de fondo */}
             {Array.from({ length: config.columns * config.rows }).map((_, i) => {
               const c = (i % config.columns) + 1;
               const r = Math.floor(i / config.columns) + 1;
@@ -123,27 +118,42 @@ export default function FinalApp({ params }: { params: Promise<{ lang: string }>
                   key={`cell-${i}`}
                   onClick={() => addItem(c, r)}
                   style={{ gridColumn: c, gridRow: r }}
-                  className="border border-border-main/40 rounded-lg transition-all flex items-center justify-center cursor-crosshair group relative overflow-hidden hover:bg-app-bg/60 hover:border-blue-500/30"
+                  className="border border-border-main/40 rounded-lg transition-all flex items-center justify-center cursor-crosshair group relative hover:bg-app-bg/60 hover:border-blue-500/30"
                 >
-                  <Plus 
-                    size={14} 
-                    className="text-slate-500 opacity-20 group-hover:opacity-100 group-hover:text-blue-500 group-hover:scale-110 transition-all" 
-                  />
+                  <Plus size={14} className="text-slate-500 opacity-20 group-hover:opacity-100 group-hover:text-blue-500 transition-all" />
                 </div>
               );
             })}
 
-            {reindexedItems.map((item) => (
-              <GridItem
-                key={item.id}
-                item={item}
-                config={config}
-                onRemove={removeItem}
-                onResizeStart={onResizeStart}
-                onResizeUpdate={onResizeUpdate}
-                onResizeEnd={onResizeEnd}
-              />
-            ))}
+            {/* PREVIEW DE ARRASTRE - RESTAURADO */}
+            {activeDragItem && dragPreview && (
+              <div style={{
+                gridColumn: `${dragPreview.colStart} / span ${activeDragItem.colSpan}`,
+                gridRow: `${dragPreview.rowStart} / span ${activeDragItem.rowSpan}`,
+                backgroundColor: 'rgba(59, 130, 246, 0.1)', 
+                border: '2px dashed #3b82f6',
+                zIndex: 5,
+                borderRadius: '8px',
+                pointerEvents: 'none'
+              }} className="animate-pulse" />
+            )}
+
+            {reindexedItems.map((item) => {
+              const isDraggingThis = activeDragItem?.id === item.id;
+              const displayItem = isDraggingThis ? { ...activeDragItem, number: item.number } : item;
+
+              return (
+                <GridItem
+                  key={item.id}
+                  item={displayItem}
+                  config={config}
+                  onRemove={removeItem}
+                  onResizeStart={onResizeStart}
+                  onResizeUpdate={onResizeUpdate}
+                  onResizeEnd={onResizeEnd}
+                />
+              );
+            })}
           </div>
         </DndContext>
       </main>

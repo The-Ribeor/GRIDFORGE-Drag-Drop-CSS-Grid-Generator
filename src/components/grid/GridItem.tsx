@@ -17,14 +17,13 @@ interface GridItemProps {
 export const GridItem = React.memo(({ 
   item, 
   onRemove, 
-  onResizeEnd, 
   onResizeUpdate, 
   onResizeStart, 
   config 
 }: GridItemProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: item.id });
   const [resizePreview, setResizePreview] = useState<{ col: number, row: number } | null>(null);
-  const [isSelected, setIsSelected] = useState(false); // Estado para controlar la selección en móvil
+  const [isSelected, setIsSelected] = useState(false); // Estado para selección manual en móvil
   const isResizing = useRef(false);
 
   const colorClasses = ['bg-item-1', 'bg-item-2', 'bg-item-3', 'bg-item-4', 'bg-item-5'];
@@ -35,8 +34,8 @@ export const GridItem = React.memo(({
     gridColumn: `${item.colStart} / span ${item.colSpan}`,
     gridRow: `${item.rowStart} / span ${item.rowSpan}`,
     zIndex: isDragging || isSelected ? 100 : 10,
-    transition: isDragging ? 'none' : 'opacity 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
-    opacity: isDragging ? 0.9 : 1,
+    transition: isDragging ? 'none' : 'opacity 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease',
+    opacity: isDragging ? 0.8 : 1,
     touchAction: 'none',
   };
 
@@ -86,10 +85,9 @@ export const GridItem = React.memo(({
     window.addEventListener('touchend', onEnd);
   };
 
-  // Función para manejar el toque y alternar selección
-  const handleToggleSelect = (e: React.MouseEvent | React.TouchEvent) => {
-    // Si estamos arrastrando o redimensionando, no hacemos nada
-    if (isDragging || isResizing.current) return;
+  // Alternar selección al tocar/clicar (sin interrumpir el drag)
+  const toggleSelection = (e: React.MouseEvent | React.TouchEvent) => {
+    if (isResizing.current) return;
     setIsSelected(!isSelected);
   };
 
@@ -100,44 +98,54 @@ export const GridItem = React.memo(({
           gridColumn: `${item.colStart} / span ${resizePreview.col}`,
           gridRow: `${item.rowStart} / span ${resizePreview.row}`,
           backgroundColor: 'rgba(56, 189, 248, 0.15)',
-          border: '2px solid #38bdf8',
-          zIndex: 40, borderRadius: '8px', pointerEvents: 'none'
+          border: '2px dashed #38bdf8',
+          zIndex: 5, borderRadius: '8px', pointerEvents: 'none'
         }} className="animate-pulse" />
       )}
 
       <div 
         ref={setNodeRef} 
         style={style} 
-        onClick={handleToggleSelect}
+        onPointerDown={() => {
+            // Si el usuario empieza a tocar otro ítem, podríamos querer deseleccionar otros (opcional)
+        }}
         className={`relative ${selectedBgClass} border rounded-lg flex items-center justify-center text-2xl font-bold group shadow-md transition-all ${
           isDragging || isSelected 
-            ? 'shadow-2xl ring-2 ring-blue-500 border-blue-500 z-[100]' 
+            ? 'shadow-2xl ring-2 ring-blue-500 border-blue-500 z-[50]' 
             : 'border-border-main hover:border-blue-500 cursor-grab'
         }`}
       >
-        <div {...listeners} {...attributes} className="w-full h-full flex items-center justify-center select-none italic text-text-title">
+        <div 
+          {...listeners} 
+          {...attributes} 
+          onClick={toggleSelection}
+          className="w-full h-full flex items-center justify-center select-none italic text-text-title"
+        >
           {item.number}
         </div>
 
-        {/* Los controles solo aparecen si está seleccionado (móvil/web) o en hover (web) */}
-        {(isSelected || isDragging) && (
-          <>
+        {/* Controles: visibles en Hover (PC) o cuando isSelected es true (Móvil) */}
+        <div className={`absolute inset-0 pointer-events-none transition-opacity ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+            
+            {/* Botón X para eliminar */}
             <button 
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
               onClick={(e) => { e.stopPropagation(); onRemove(item.id); }} 
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 z-[110] shadow-xl hover:scale-110 active:scale-90"
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 pointer-events-auto z-[110] shadow-xl hover:scale-110 active:scale-90"
             >
               <X size={14} />
             </button>
 
+            {/* Tirador para redimensionar */}
             <div 
               onMouseDown={handleResizeStart} 
               onTouchStart={handleResizeStart}
-              className="absolute bottom-0 right-0 w-10 h-10 cursor-nwse-resize z-[110] flex items-end justify-end p-1 bg-transparent"
+              className="absolute bottom-0 right-0 w-10 h-10 cursor-nwse-resize pointer-events-auto z-[110] flex items-end justify-end p-1"
             >
               <div className="w-4 h-4 border-r-[3px] border-b-[3px] border-blue-500 rounded-br-sm" />
             </div>
-          </>
-        )}
+        </div>
       </div>
     </>
   );
